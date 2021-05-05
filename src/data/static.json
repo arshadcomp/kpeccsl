@@ -1,0 +1,30 @@
+{
+	"lists" : [
+		{
+			"name" : "featured",
+			"ids":[
+				"a810f5c6-07d3-49cf-989b-93875afa36ac",
+				"3da2d9de-9e5f-41ee-a5c2-0c4cb1c972a0"
+			]
+		},
+		{
+			"name" : "covid_essential",
+			"ids":[
+				"f810f29f-200a-48f4-8afd-abb332a9ed8f"
+			]
+		},
+		{
+			"name" : "survival_kit",
+			"ids":[
+				"bd1b032d-802b-4f6e-a427-b87327d0a34b"
+			]
+		},
+		{
+			"name" : "rain_is_coming",
+			"ids":[
+				"58980ce0-d0d4-44bc-81f0-af7f4376832f",
+				"896a36dd-faff-4f2e-a320-0b6324084299"
+			]
+		}
+	]
+}
