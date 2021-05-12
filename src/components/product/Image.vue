@@ -35,8 +35,9 @@ export default {
 		},
 		defaultImg() {
 			if(this.category)
+				// return this.category.images[Math.floor(Math.random() * this.category.images.length)].substring(0,40) + '200x200'
 				return this.category.images[Math.floor(Math.random() * this.category.images.length)]
-			return 'https://source.unsplash.com/Hz4FAtKSLKo/640x480'
+			return 'https://source.unsplash.com/Hz4FAtKSLKo/200x200'
 		},
 		inS3Storage() {
 			return !this.imageUrl.includes("http")

@@ -63,6 +63,10 @@
       v-model="product.price"
       label="Price"
     ></v-text-field>
+    <v-text-field
+      v-model="product.leastCount"
+      label="Minimum Purchase Quantity"
+    ></v-text-field>
 
     <v-checkbox
       v-model="product.featured"
@@ -91,6 +95,7 @@
         this.product.rate = parseFloat(this.product.rate)
         this.product.gst = parseFloat(this.product.gst)
         this.product.price = parseFloat(this.product.price)
+        this.product.leastCount = parseFloat(this.product.leastCount)
 				this.$store.dispatch('updateProduct', this.product)
       }
     }

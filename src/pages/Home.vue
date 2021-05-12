@@ -4,6 +4,17 @@
 
 		<v-alert
 			border="left"
+			color="error"
+			:icon="$vuetify.breakpoint.mobile ? false : 'mdi-account'"
+			dark
+			prominent
+		>
+			<h2>Profile Update</h2>
+			<p>Please update your area in the Profile section after login. This will help us better manage our deliveries.</p>
+		</v-alert>
+
+		<v-alert
+			border="left"
 			color="indigo"
 			:icon="$vuetify.breakpoint.mobile ? false : 'mdi-package'"
 			dark
@@ -40,6 +51,17 @@
 		>
 			<h2>Errors</h2>
 			<p>We are in the process of finalising the app and it has not been tested very thoroughly, so you may encounter certain bugs during you shopping experience. Please do inform us about the errors screenshot and be rest assured we will rectify them as soon as possible.</p>
+		</v-alert>
+		<v-alert
+			border="left"
+			color="secondary"
+			:icon="$vuetify.breakpoint.mobile ? false : 'mdi-github'"
+			dark
+			prominent
+			class="mt-6"
+		>
+			<h2>Open Source</h2>
+			<p>This is an open source project developed by Mohammad Arshad. Source code is available as Git Repo on <v-icon>mdi-github</v-icon> GitHub. Feel free to fork and contribute for the improvements of the project.</p>
 		</v-alert>
 
 	</v-sheet>

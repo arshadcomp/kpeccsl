@@ -33,32 +33,6 @@
 		</v-row>
 		<v-sheet class="mx-n3 d-flex d-md-none">
 			<OrderItems/>
-			<!-- <v-card
-				flat
-			>
-				<v-list three-line>
-					<v-subheader>MY ORDERS</v-subheader>
-					<v-list-item-group v-for="order in orders" :key="order.id">
-						<v-list-item v-for="item in order.items" :key="item.id" :to="'/order/'+order.id">
-							<v-list-item-avatar
-								rounded
-							>
-							<v-img :src="item.image"></v-img>
-							</v-list-item-avatar>
-							<v-list-item-content>
-								<v-list-item-title v-html="order.status" class="error--text"></v-list-item-title>
-								<v-list-item-subtitle v-html="item.name"></v-list-item-subtitle>
-							</v-list-item-content>
-							<v-list-item-action>
-								<v-btn icon>
-									<v-icon color="grey lighten-1">mdi-chevron-right</v-icon>
-								</v-btn>
-							</v-list-item-action>
-						</v-list-item>
-						<v-divider></v-divider>
-					</v-list-item-group>
-				</v-list>
-			</v-card> -->
 		</v-sheet>
 
 	</v-sheet>
@@ -68,8 +42,8 @@
 import OrderItems from '@/components/order/Items'
 
 export default {
-	created() {
-		this.$store.dispatch('myOrders')
+	async created() {
+		await this.$store.dispatch('myOrders')
 	},
 	data()  {
 		return {

@@ -5,15 +5,26 @@
 		dark
 	>
 	<!-- <v-app-bar-nav-icon class="d-flex d-md-none" @click.stop="$emit('toggle-drawer')"></v-app-bar-nav-icon> -->
+	<!-- src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png" -->
 		<div class="d-flex align-center">
-			<v-img
-				alt="Vuetify Logo"
+			<v-avatar color="white" rounded>
+				<v-img
+					alt="KPECCSL Logo"
+					class="shrink"
+					contain
+					src="https://kpeccsla899646943534aa39c34c64fd72f84ad100548-dev.s3.ap-south-1.amazonaws.com/public/logo.png"
+					transition="scale-transition"
+					width="40"
+				/>
+			</v-avatar>
+			<!-- <v-img
+				alt="KPECCSL Logo"
 				class="shrink mr-2"
 				contain
-				src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+				src="https://kpeccsla899646943534aa39c34c64fd72f84ad100548-dev.s3.ap-south-1.amazonaws.com/public/logo.png"
 				transition="scale-transition"
 				width="40"
-			/>
+			/> -->
 			<v-toolbar-title>
 				<v-btn
 					to="/"

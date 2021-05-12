@@ -3,31 +3,10 @@
 		color="indigo text--lighten-1"
     padless
   >
-    <!-- <v-row>
-      <v-col cols="12" md="3">
-        <v-subheader><small>ABOUT</small></v-subheader>
-      </v-col>
-      <v-col cols="12" md="3">
-        <v-subheader><small>LINKS</small></v-subheader>
-      </v-col>
-      <v-col cols="12" md="3">
-        <v-subheader><small>Registered Office</small></v-subheader>
-      </v-col>
-    </v-row> -->
     <v-row
       justify="center"
       no-gutters
     >
-      <!-- <v-btn
-        v-for="link in links"
-        :key="link"
-        color="white"
-        text
-        rounded
-        class="my-2"
-      >
-        {{ link }}
-      </v-btn> -->
       <v-col cols="12" md="3">
         <v-subheader class="white--text"><small>ABOUT</small></v-subheader>
         <v-list flat color="indigo text--lighten-1">
@@ -72,6 +51,7 @@
         class="indigo lighten-1 py-4 text-center white--text"
         cols="12"
       >
+        <small>Developed By: <a mailto="arshad.comp@gmail.com"></a>arshad.comp@gmail.com</small><br>
         <v-icon class="white--text">mdi-copyright</v-icon> 1991 - {{ new Date().getFullYear() }} — <strong>{{companyName}}</strong>
       </v-col>
     </v-row>

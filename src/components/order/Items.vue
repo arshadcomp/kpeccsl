@@ -34,66 +34,47 @@
 		</v-list>
 	</div>
 	<div v-else>
-		<v-card v-for="order in orders" :key="order.id"
-			class="mb-3"
-			outlined
-		>
-			<v-card-text class="d-flex justify-space-between pb-0">
-				<span class="font-weight-light text-uppercase">ORDER ID# {{order.id.substring(0,8)}}</span>
-				<v-chip
-					class="ma-2"
-					:color="order.status=='PENDING' ? 'red' : 'green'"
-					text-color="white"
+		<v-row v-if="orders && admin">
+			<v-col v-for="order in orders" :key="order.id">
+				<Item :order="order" :admin="admin" :showAddress="showAddress"/>
+			</v-col>
+		</v-row>
+		<v-row v-if="orders && !admin">
+			<v-col v-for="order in orders" :key="order.id" cols="12">
+				<Item :order="order" :admin="admin" :showAddress="showAddress"/>
+			</v-col>
+			<v-col class="pa-6" v-if="nextToken" cols="12">
+				<v-btn
+					@click="loadMore"
 				>
-					{{order.status}}
-				</v-chip>
-			</v-card-text>
-			<v-card-text class="pt-0">
-				Date: {{ getDate(order.createdAt) }}
-				<User :userID="order.owner" :showAddress="showAddress"/>
-			</v-card-text>
-			
-			
-			<v-list-item three-line v-for="item in order.items" :key="item.id" @click="goto(order)">
-				<v-list-item-avatar
-					size="80"
-					color="grey"
-					rounded
+					Load More
+				</v-btn>
+			</v-col>
+		</v-row>
+		<v-row v-if="admin">
+			<v-col class="pa-6" v-if="nextToken">
+				<v-btn
+					@click="loadMore"
 				>
-					<ProductImage :imageUrl="item.image"/>
-				</v-list-item-avatar>
-
-				<v-list-item-content>
-					<v-list-item-title class="headline mb-1">
-						{{item.name}}
-					</v-list-item-title>
-					<v-list-item-subtitle>
-						&#8377; {{item.price}} X {{item.quantity}} {{item.unit=='nos' ? '' : item.unit }}
-					</v-list-item-subtitle>
-				</v-list-item-content>
-				
-				<v-list-item-action>
-					<v-btn small color="primary" :to="'/product/'+item.id" outlined class="mb-3">
-						<v-icon small>mdi-star</v-icon> REVIEW
-					</v-btn>
-					<small>FREE DELIVERY</small>
-				</v-list-item-action>
-
-			</v-list-item>
-			<p class="text-right text-lg-h6 pr-4">
-				Total: &#8377; {{ order.items.reduce((total, item) => { return total + item.price*item.quantity}, 0) }}
-			</p>
-		</v-card>
+					Load More
+				</v-btn>
+			</v-col>
+			<v-col class="pa-6" v-else>
+				<PrintOrderList />
+			</v-col>
+		</v-row>
 	</div>
 </template>
 
 <script>
-import User from '@/components/user/OrderProfile'
-import ProductImage from '@/components/product/Image.vue'
+// import User from '@/components/user/OrderProfile'
+// import ProductImage from '@/components/product/Image.vue'
+import Item from '@/components/order/Item'
+import PrintOrderList from '@/components/order/Print'
 
 export default {
 	name: 'order-items',
-	props: ['showAddress'],
+	props: ['showAddress', 'admin', 'status'],
 	data() {
 		return {
 			dialog: false
@@ -102,20 +83,31 @@ export default {
 	computed: {
 		orders() {
 			return this.$store.getters.orders
+		},
+		nextToken() {
+			return this.$store.getters.nextToken
 		}
 	},
 	methods: {
 		goto(order) {
 			this.$router.push('/order/'+order.id)
 		},
-		getDate(createdAt) {
-			let date = new Date(createdAt)
-			return date.getDate()+'-'+date.getMonth()+'-'+date.getFullYear()
+		// getDate(createdAt) {
+		// 	let date = new Date(createdAt)
+		// 	return date.getDate()+'-'+date.getMonth()+'-'+date.getFullYear()
+		// }
+		loadMore() {
+			console.log('Load More Items')
+			console.log('NEXT TOKEN', this.nextToken)
+			console.log('NEXT TOKEN', this.status)
+			this.$store.dispatch('ordersByStatus', { status: this.status, nextToken: this.nextToken })
 		}
 	},
 	components: {
-		User,
-		ProductImage
+		// User,
+		// ProductImage,
+		Item,
+		PrintOrderList
 	}
 }
 </script>

@@ -58,9 +58,29 @@
 
 			max-width="200"
 		></v-text-field>
-		<!-- <p class="text-subtitle-1 mb-0">RESULTS</p> -->
+		
+		<v-list v-if="$vuetify.breakpoint.mobile" three-line>
+			
+			<v-list-item v-for="product in filteredProducts" :key="product.id" class="px-0" @click="goto(product.id)">
+				<ProductItem :id="product.id"/>
+			</v-list-item>
+		</v-list>
 
-		<v-row>
+		<v-container fluid class="px-0" v-else>
+			<p>Result</p>
+			<v-row>
+				<v-col
+          v-for="product in filteredProducts"
+          :key="product.id"
+					cols="3"
+        >
+					<ProductItem :id="product.id"/>
+				</v-col>
+			</v-row>
+		</v-container>
+
+
+		<!-- <v-row>
 			<v-col :sm="12" :md="9">
 				<v-row>
 					<v-col>
@@ -81,14 +101,6 @@
 					></v-switch>
 					<v-alert dense border="left" color="error" dark>Other Filters are still under development</v-alert>
 					<v-list-item>
-						<!-- <v-list-item-action>
-							<v-switch
-								v-model="withStock"
-							></v-switch>
-							<v-list-item-content>
-								{{stockSwitchLabel}}
-							</v-list-item-content>
-						</v-list-item-action> -->
 					</v-list-item>
 					<v-list-item v-for="category in categories" :key="category">
 						<template v-slot:default="{ active }">
@@ -104,21 +116,26 @@
 				</v-list>
 
 			</v-col>
-		</v-row>
+		</v-row> -->
 	</v-sheet>
 </template>
 
 <script>
-import ProductItems from '@/components/product/Items'
+import ProductItem from '@/components/product/ItemById'
+// import ProductItems from '@/components/product/Items'
 
 export default {
 	name: 'search',
-	// created() {
-	// 	if(this.$store.products == 0)
-	// 		this.$store.dispatch('allProducts')
+	async created() {
+		if(this.$store.getters.products.length === 0)
+			await this.$store.dispatch('productsWithName')
+	},
+	// mounted() {
+	// 	this.filteredProducts = this.$store.getters.productsSortedByName
 	// },
 	data() {
 		return {
+			// filteredProducts: [],
 			query: '',
 			drawer: false,
 			withStock: false,
@@ -127,12 +144,7 @@ export default {
 				'Grocery',
 				'Appliances',
 				'Home Furnishing'
-			],
-			items: [
-				{ title: 'Home', icon: 'mdi-home-city' },
-				{ title: 'My Account', icon: 'mdi-account' },
-				{ title: 'Users', icon: 'mdi-account-group-outline' },
-			],
+			]
 		}
 	},
 	watch: {
@@ -143,10 +155,14 @@ export default {
 	computed: {
 		stockSwitchLabel() {
 			return this.withStock ? 'Include Out of Stock' : 'Remove Out of Stock'
+		},
+		filteredProducts() {
+			return this.$store.getters.productsSortedByName
 		}
 	},
 	components: {
-		ProductItems
+		// ProductItems,
+		ProductItem
 	},
 	methods: {
 		clearQuery() {

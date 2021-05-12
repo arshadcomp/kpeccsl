@@ -43,7 +43,7 @@
 					</v-list-item-subtitle>
 				</v-list-item-content>
 				<v-list-item-action>
-					<v-dialog
+					<!-- <v-dialog
 						v-model="dialog"
 						max-width="500"
 					>
@@ -81,11 +81,11 @@
 								</v-btn>
 							</v-card-actions>
 						</v-card>
-					</v-dialog>
+					</v-dialog> -->
 
-          <!-- <v-btn small color="primary" :to="'/profile'" outlined>
-            EDIT
-          </v-btn> -->
+          <v-btn small color="primary" :to="'/profile'" outlined>
+            UPDATE
+          </v-btn>
         </v-list-item-action>
 			</v-list-item>
 			<v-divider></v-divider>

@@ -22,7 +22,7 @@
 		<v-list v-if="$vuetify.breakpoint.mobile" three-line>
 			
 			<v-list-item v-for="product in products" :key="product.id" class="px-0" @click="goto(product.id)">
-				<ProductItem :product="product"/>
+				<ProductItem :id="product.id"/>
 			</v-list-item>
 		</v-list>
 
@@ -33,7 +33,7 @@
           :key="product.id"
           :cols="$vuetify.breakpoint.mobile ? '12' : '3'"
         >
-					<ProductItem :product="product"/>
+					<ProductItem :id="product.id"/>
 				</v-col>
 			</v-row>
 		</v-container>
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import ProductItem from '@/components/product/Item'
+import ProductItem from '@/components/product/ItemById'
 
 export default {
 	name: 'product-items',

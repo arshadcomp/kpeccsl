@@ -1,6 +1,6 @@
 <template>
 	<v-sheet>
-		<div class="mb-3">
+		<!-- <div class="mb-3">
 			<h3>Bulk Delete</h3>
 			<v-btn
 				@click="bulkDeleteInvetory"
@@ -15,6 +15,44 @@
 			>
 			DELETE ALL PRODUCTS
 			</v-btn>
+		</div> -->
+
+		<div class="mb-3"> 
+			<h3>Update Products Inventory From Tally</h3>
+			<v-sheet>
+				<v-file-input
+					v-model="inventoryFile"
+					accept=".json"
+					truncate-length="24"
+				></v-file-input>
+				<v-btn
+					class="mr-3"
+					v-if="inventoryFile"
+					@click="uploadFile(inventoryFile)"
+				>
+				UPLOAD
+				</v-btn>
+				<v-btn
+					class="mr-3"
+					v-if="inventoryFile && fileUploaded"
+					@click="loadInventoryFile"
+				>
+				LOAD INVENTORY
+				</v-btn>
+				<v-btn
+					v-if="inventoryItems.length > 0"
+					@click="batchUpdateInventory"
+				>
+				UPDATE <span v-if="nextToken"> MORE </span> INVENTORY
+				</v-btn>
+			</v-sheet>
+			<v-sheet class="my-6">
+				<template v-for="(updatedProductsSize, i) in updatedProducts">
+					<v-card :key="i" class="pa-3 mb-2">
+						{{updatedProductsSize}} products updated
+					</v-card>
+				</template>
+			</v-sheet>
 		</div>
 		
 		<div class="mb-3">
@@ -27,7 +65,7 @@
 				></v-file-input>
 				<v-btn
 					class="mr-3"
-					@click="uploadFile"
+					@click="uploadFile(rawFile)"
 				>
 				UPLOAD
 				</v-btn>
@@ -54,7 +92,6 @@
 				UPLOAD
 				</v-btn>
 			</v-sheet>
-
 		</div>
 
 
@@ -73,38 +110,21 @@ import { Storage } from 'aws-amplify';
 export default {
 	name: 'admin-product-index',
 	async mounted() {
-		// let items = raw.RAIDRRRep.slice(0,10)
-		// console.log('ITEMS', items)
-		// items.forEach(item => {
-		// 	item.name = item.name.trim().substr(0, item.name.indexOf('*'))
-		// 	item.keyword = item.name.toLowerCase().replace(/[0-9]/g, '')
-		// 	item.seller = { gstin: '29AAAAK3464F1ZO', name: 'KPECCSL' }
-		// 	item.leastCount = 1
-		// 	item.featured = false
-		// 	if(item.stock === undefined)
-		// 		item.stock = 0
-		// });
-		// console.log('ITEMS', items)
-
-		// this.$store.dispatch('bulkAddProduct', items)
-
-		// FOR READING STATIC DATA
-		// const staticData = await Storage.get('static.json', { download: true})
-		// const fr = new FileReader()
-		// const blob = new Blob([staticData.Body], {type:"application/json"});
-		// fr.addEventListener("load", () => {
-		// 	console.log('READING FILE')
-		// 	var items = JSON.parse(fr.result)
-		// 	console.log('ITEMS IN FILE', items)
-		// });
-
-		// fr.readAsText(blob);
+		// convert-excel-to-json --config='{"sourceFile":"Downloads/pricelist.xlsx", "header":{"rows":4}, "columnToKey":{"B":"hsn","C":"code","D":"name","E":"tax","F":"mrp","G":"unit","H":"purchase_rate","I":"rate","J":"gst","K":"price","L":"stock"} }' > Downloads/kpecs.json
 	},
 	data() {
 		return {
+			fileUploaded: false,
+			inventoryFile: null,
+			inventoryItems: [],
+			products: [],
+			nextToken: null,
+			updatedProducts: [],
+			
 			rawFile: null,
 			staticDataFile: null,
-			items: []
+			items: [],
+
 		}
 	},
 	methods: {
@@ -122,16 +142,18 @@ export default {
 			console.log('FILE', file)
 
 			// If file is to be uploaded to S3
-			
-			Storage.put(file.name, file, {
-				contentType: file.type
-			})
-			.then(response => {
-				console.log('FILE UPLOADED', response)
-			})
-			.catch(error => {
-				console.log('ERROR UPLOADING FILE', error)
-			})
+			if(file) {
+				Storage.put(file.name, file, {
+					contentType: file.type
+				})
+				.then(response => {
+					console.log('FILE UPLOADED', response)
+					this.fileUploaded = true
+				})
+				.catch(error => {
+					console.log('ERROR UPLOADING FILE', error)
+				})
+			}
 		},
 		updateData() {
 			const fr = new FileReader()
@@ -161,6 +183,39 @@ export default {
 			console.log('ITEMS FORMATTED', items)
 
 			this.$store.dispatch('bulkAddProduct', items)
+		},
+		loadInventoryFile() {
+			const fr = new FileReader()
+			const blob = new Blob([this.inventoryFile], {type:"application/json"});
+
+			fr.addEventListener("load", () => {
+				console.log('READING INVENTORY FILE')
+				var items = JSON.parse(fr.result).RAIDRRRep
+				// console.log('ITEMS IN FILE', items)
+				this.inventoryItems = items
+				// this.batchUpdateInventory()
+			});
+			fr.readAsText(blob);
+		},
+		async batchUpdateInventory() {
+			if(this.inventoryItems.length > 0){
+				const productList = await this.$store.dispatch('productListForUpdate', this.nextToken)
+				this.products = productList.items
+				this.nextToken = productList.nextToken
+				
+				await this.products.forEach(product => {
+					const item = this.inventoryItems.find(item => item.code===product.code)
+					if(item) {
+						if(item.stock === undefined || item.stock < 0)
+							item.stock = 0
+						if(product.inventory.stock!==item.stock) {
+							console.log('UPDATE INVENTORY FOR', item.name, product.inventory.stock, item.stock)
+							this.$store.dispatch('updateInventory', { id:product.inventory.id, stock: item.stock })
+						}
+					}
+				})
+				this.updatedProducts.push(this.products.length)
+			}
 		}
 	}
 }
