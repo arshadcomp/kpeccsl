@@ -32,6 +32,7 @@ const store = new Vuex.Store({
       cart: [],
       order: {},
       orders: [],
+      nextToken: null,
 
       minCartAmount: 500,
 

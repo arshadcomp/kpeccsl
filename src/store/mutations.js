@@ -34,8 +34,14 @@ import {
 	CREATE_ORDER, 
 	CREATE_ORDER_SUCCESS, 
 	CREATE_ORDER_FAILURE,
-
-	LIST_ORDER_SUCCESS
+	UPDATE_ORDER, 
+	UPDATE_ORDER_SUCCESS, 
+	UPDATE_ORDER_FAILURE,
+	GET_ORDER_SUCCESS,
+	LIST_ORDER_SUCCESS,
+	EMPTY_ORDERS,
+	NEXT_TOKEN, 
+	UPDATE_USER_SUCCESS
 } from './mutation-types'
 
 export const appMutations = {
@@ -56,7 +62,7 @@ export const userMutations = {
 	},
 	[SET_AUTH_DATA](state, authData) {
 		state.user = authData
-		if(authData.signInUserSession.accessToken.payload['cognito:groups'].indexOf('Admin') > -1) 
+		if(authData && authData.signInUserSession && authData.signInUserSession.accessToken && authData.signInUserSession.accessToken.payload && authData.signInUserSession.accessToken.payload['cognito:groups'] && authData.signInUserSession.accessToken.payload['cognito:groups'].indexOf('Admin') > -1) 
 			state.isAdmin = true
 		else 
 			state.isAdmin = false
@@ -64,6 +70,12 @@ export const userMutations = {
 	[GET_USER_SUCCESS](state, payload) {
 		if(state.users.findIndex(u => u.Username ===payload.Username) < 0)
 			state.users.push(payload)
+		state.showLoader = false
+	},
+	[UPDATE_USER_SUCCESS] (state, payload) {
+		state.user.attributes.address = payload.address
+		if(payload['custom:Area'])
+			state.user.attributes['custom:Area'] = payload['custom:Area']
 		state.showLoader = false
 	}
 }
@@ -137,12 +149,19 @@ export const productMutations = {
 
 export const cartMutations = {
 	[ADD_TO_CART]: (state, payload) => {
-		payload.quantity = 1
-		const category = state.productCategories.find(c => c.hsn.includes(payload.hsn))
-		if(category)
-				payload.image = category.images[Math.floor(Math.random() * category.images.length)]
+		if(payload.leastCount)
+			payload.quantity = payload.leastCount
 		else
-			payload.image =  'https://source.unsplash.com/Hz4FAtKSLKo/640x480'
+			payload.quantity = 1
+		if(payload.image) 
+			payload.image = payload.image+'/200x200'
+		else {
+			const category = state.productCategories.find(c => c.hsn.includes(payload.hsn))
+			if(category)
+					payload.image = category.images[Math.floor(Math.random() * category.images.length)].substr(0,40)+'200x200'
+			else
+				payload.image =  'https://source.unsplash.com/Hz4FAtKSLKo/200x200'
+		}
 		state.cart.push(payload)
 		console.log('Cart', state.cart)
 	},
@@ -151,14 +170,26 @@ export const cartMutations = {
 		state.cart[index].quantity = 0
 	},
 	[INCREMENT_CART_QUANTITY]: (state, product) => {
-		if(product.inventory.stock !== undefined && product.inventory.stock !== 0 && product.quantity < product.inventory.stock)
-			product.quantity++
+		if(product.leastCount === undefined)
+			product.leastCount = 1
+		if(product.inventory.stock !== undefined && product.inventory.stock !== 0 && (product.quantity + product.leastCount) < product.inventory.stock)
+			product.quantity += product.leastCount
+		
+		// if(product.leastCount) {
+		// 	if(product.inventory.stock !== undefined && product.inventory.stock !== 0 && (product.quantity + product.leastCount) < product.inventory.stock)
+		// 	product.quantity += product.leastCount
+		// } else {
+		// 	if(product.inventory.stock !== undefined && product.inventory.stock !== 0 && product.quantity < product.inventory.stock)
+		// 		product.quantity++
+		// }
 		// Here indication for maximum stock reached to be displayed.
 		console.log('CART ITEM INCREMENT', state.cart)
 	},
 	[DECREMENT_CART_QUANTITY]: (state, product) => {
+		if(product.leastCount === undefined)
+			product.leastCount = 1 
 		if(product.quantity !== product.leastCount)
-			product.quantity--
+			product.quantity -= product.leastCount
 		console.log('CART ITEM DECREMENT', state.cart)
 	},
 	[REMOVE_FROM_CART]: (state, product_id) => {
@@ -182,10 +213,36 @@ export const orderMutations = {
 		state.order = false
 		state.showLoader = false
 	},
+	[GET_ORDER_SUCCESS]: (state, order) => {
+		const index = state.orders.findIndex(o => o.id === order.id)
+		if(index >= 0)
+			state.orders.splice(index, 1)
+		state.orders.push(order)
+	},
 	[UPDATE_INVENTORY]: (state) =>  {
 		state.showLoader = false
 	},
+	[EMPTY_ORDERS]: (state) => {
+		state.orders = []
+	},
 	[LIST_ORDER_SUCCESS] : (state, payload) => {
-		state.orders = payload
+		// How to manage if items already existing
+		state.orders = state.orders.concat(payload.items)
+	},
+	[NEXT_TOKEN] : (state, payload) => {
+		console.log('NEXT TOKEN', payload)
+		state.nextToken = payload
+	},
+	[UPDATE_ORDER] : (state) => {
+		state.showLoader = true
+	},
+	[UPDATE_ORDER_SUCCESS] : (state, payload) => {
+		let order = state.orders.find(o => o.id === payload.id)
+		if(order)
+			order.status = payload.status
+		state.showLoader = false
+	},
+	[UPDATE_ORDER_FAILURE] : (state) => {
+		state.showLoader = false
 	}
 }

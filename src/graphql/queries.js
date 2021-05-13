@@ -99,46 +99,6 @@ export const listCategorys = /* GraphQL */ `
     }
   }
 `;
-export const productByCategory = /* GraphQL */ `
-  query ProductByCategory(
-    $hsn: String
-    $sortDirection: ModelSortDirection
-    $filter: ModelProductFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    productByCategory(
-      hsn: $hsn
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        keyword
-        name
-        description
-        hsn
-        code
-        tax
-        mrp
-        purchase_rate
-        rate
-        gst
-        price
-        image
-        unit
-        leastCount
-        featured
-        quantity
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
 export const productByCode = /* GraphQL */ `
   query ProductByCode(
     $code: String

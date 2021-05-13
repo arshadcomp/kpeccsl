@@ -1,10 +1,12 @@
-import { API } from 'aws-amplify';
+import { API, Auth } from 'aws-amplify';
 import { Storage } from 'aws-amplify';
 
 import { createProduct } from '@/graphql/mutations';
 import { getProduct } from '@/graphql/queries';
-// import { listProducts } from '@/graphql/queries';
+// import { productByCode } from '@/graphql/customQueries'
 import { listProducts } from '@/graphql/customQueries';
+import { searchProducts } from '@/graphql/customQueries';
+import { listProductsWithName } from '@/graphql/customQueries';
 import { updateProduct } from '@/graphql/mutations';
 import { deleteProduct } from '@/graphql/mutations';
 
@@ -22,6 +24,8 @@ import { deleteInventory } from '@/graphql/mutations';
 
 // import { byUserByTime } from '@/graphql/queries'
 // import { ordersbyUserByTime } from '@/graphql/queries'
+import { updateOrder } from '@/graphql/mutations';
+import { getOrder } from '@/graphql/queries';
 import { ordersByUserByTime } from '@/graphql/customQueries'
 import { ordersByStatusByUser } from '@/graphql/customQueries'
 import { listOrders } from '@/graphql/queries'
@@ -34,6 +38,7 @@ import {
   TOGGLE_DRAWER,
 
   GET_USER_SUCCESS,
+  UPDATE_USER_SUCCESS,
 
   ADD_PRODUCT,
   ADD_PRODUCT_SUCCESS,
@@ -60,8 +65,13 @@ import {
   CREATE_ORDER,
   CREATE_ORDER_SUCCESS,
   CREATE_ORDER_FAILURE,
-
-  LIST_ORDER_SUCCESS
+  UPDATE_ORDER, 
+	UPDATE_ORDER_SUCCESS, 
+	UPDATE_ORDER_FAILURE,
+  GET_ORDER_SUCCESS,
+  EMPTY_ORDERS,
+  LIST_ORDER_SUCCESS,
+  NEXT_TOKEN,
 
 } from './mutation-types'
 
@@ -84,21 +94,55 @@ export const userActions = {
         },
         headers: {
           'Content-Type' : 'application/json',
-          // Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
           Authorization: state.user.signInUserSession.getAccessToken().getJwtToken()
         }
       })
       .then(user => {
-        // commit(HIDE_LOADER)
         console.log('USER', user)
         commit(GET_USER_SUCCESS, user)
-        // this.loading = false
-        // this.user =  user.UserAttributes
-        // this.$store.commit(ADD_TO_USERS, this.user)
       })
       .catch(error => {
         console.log('ERROR FETCHING USER ATTRIBUTES', error)
       })
+  },
+  userById({commit, state}, userID) {
+    console.log('USER ID', userID)
+    commit(SHOW_LOADER)
+    return API.get(
+      'AdminQueries', 
+      '/getUser', 
+      {
+        queryStringParameters: {
+          "username": userID
+        },
+        headers: {
+          'Content-Type' : 'application/json',
+          Authorization: state.user.signInUserSession.getAccessToken().getJwtToken()
+        }
+      })
+      .then(user => {
+        console.log('USER', user)
+        commit(GET_USER_SUCCESS, user)
+        return user
+      })
+      .catch(error => {
+        console.log('ERROR FETCHING USER ATTRIBUTES', error)
+      })
+  }, 
+  async updateUser({commit}, payload) {
+    commit(SHOW_LOADER)
+    const user = await Auth.currentAuthenticatedUser();
+    Auth.updateUserAttributes(user, {
+      'address': payload.address,
+      'custom:Area': payload['custom:Area']
+    })
+    .then( () => {
+      commit(UPDATE_USER_SUCCESS, payload)
+    })
+    .catch(error => {
+      console.log('ERROr UPDATING USER', error)
+    })
+
   }
 }
 
@@ -152,9 +196,10 @@ export const productActions = {
   },
   getProduct ({commit, state}, payload) {
     // Here the product is returned in addition to commit
+    console.log('PRODUCT ID', payload)
     commit(PRODUCT_BY_ID)
     let product = state.products.find(p => p.id === payload)
-    if(product){
+    if(product && product.inventory){
       commit(PRODUCT_BY_ID_SUCCESS, product)
       return product
     } else {
@@ -197,6 +242,18 @@ export const productActions = {
     })
     .catch(error => console.log('ERROR FETCHING PRODUCTS', error));
   },
+  productsWithName ({commit}) {
+    commit(ALL_PRODUCTS)
+    API.graphql({
+      query: listProductsWithName,
+      authMode: 'API_KEY'
+    })
+    .then(response => {
+      console.log('ALL PRODUCTS', response.data.listProducts.items)
+      commit(ALL_PRODUCTS_SUCCESS, response.data.listProducts.items)
+    })
+    .catch(error => console.log('ERROR FETCHING PRODUCTS', error));
+  },
   allProductsWithLimit ({commit}) {
     commit(ALL_PRODUCTS)
     API.graphql({
@@ -217,7 +274,27 @@ export const productActions = {
       variables: { 
         filter: { 
           keyword : { contains: payload } 
-        }
+        },
+        limit: 100000
+      },
+      authMode: 'API_KEY'
+    })
+    .then(response => {
+      console.log('SEARCH PRODUCTS', response)
+      commit(ALL_PRODUCTS_SUCCESS, response.data.listProducts.items)
+    })
+    .catch(error => console.log('ERROR FETCHING PRODUCTS', error));
+  },
+  searchProducts ({commit}, payload) {
+    commit(ALL_PRODUCTS)
+    console.log('payload',payload)
+    API.graphql({
+      query: searchProducts,
+      variables: { 
+        filter: { 
+          keyword : { contains: payload } 
+        },
+        limit: 4000
       },
       authMode: 'API_KEY'
     })
@@ -285,6 +362,7 @@ export const productActions = {
   },
   bulkDeleteInventory({dispatch, commit}) {
     console.log('BULK DELETE INVENTORY')
+    commit(SHOW_LOADER)
     API.graphql({
       query: listInventorys,
       authMode: 'API_KEY'
@@ -297,8 +375,24 @@ export const productActions = {
       }) 
     })
     .catch(error => console.log('ERROR BULK DELETING INVENTORY', error));
-    
+    commit(HIDE_LOADER)
+  },
+  productListForUpdate ({commit}, payload) {
     commit(SHOW_LOADER)
+    console.log('payload',payload)
+    return API.graphql({
+      query: listProducts,
+      variables: { 
+        nextToken: payload
+      },
+      authMode: 'API_KEY'
+    })
+    .then(response => {
+      console.log('LIST PRODUCTS', response)
+      commit(HIDE_LOADER)
+      return response.data.listProducts
+    })
+    .catch(error => console.log('ERROR FETCHING PRODUCTS', error));
   },
   getInventory ({commit}, payload) {
     API.graphql({
@@ -356,12 +450,13 @@ export const productActions = {
 
 
 export const cartActions = {
-  async addToCart({dispatch, commit, getters}, payload) {
+  async addToCart({dispatch, commit}, payload) {
     // Here API call can be added to ensure stock availability, price etc.
-    var product = getters.products.find(p => p.id === payload)
+    // var product = getters.products.find(p => p.id === payload)
+    
+    //if(product===undefined)
+    const  product = await dispatch('getProduct', payload)
     console.log('PRODUCT TO BE ADDED IN CART', product)
-    if(product===undefined)
-      product = await dispatch('productById', payload)
     commit(ADD_TO_CART, product)
   },
   removeFromCart({commit}, payload) {
@@ -451,7 +546,7 @@ export const orderActions = {
     })
     .then(response => {
       console.log('ORDERS BY USER', response)
-      commit(LIST_ORDER_SUCCESS, response.data.OrdersbyUserByTime.items)
+      commit(LIST_ORDER_SUCCESS, response.data.OrdersbyUserByTime)
     })
     .catch(error => {
       console.log('ERROR FETCHING ORDERS BY USER', error)
@@ -472,7 +567,45 @@ export const orderActions = {
       commit(UPDATE_INVENTORY)
     })
   },
+  emptyOrders({commit}) {
+    commit(EMPTY_ORDERS)
+  },
   ordersByStatus({commit}, payload) {
+    
+    API.graphql({
+      query: ordersByStatusByUser,
+      variables: {
+        status: payload.status,
+        sortDirection: 'DESC',
+        nextToken: payload.nextToken,
+        // limit: 1
+      },
+      authMode: 'AMAZON_COGNITO_USER_POOLS'
+    })
+    .then(response => {
+      console.log('ALL ORDERS', response)
+      commit(NEXT_TOKEN, response.data.OrdersbyStatusByUser.nextToken)
+      commit(LIST_ORDER_SUCCESS, response.data.OrdersbyStatusByUser)
+      
+    })
+    .catch(error => {
+      console.log('ERROR FETCHING ORDERS', error)
+      commit(UPDATE_INVENTORY)
+    })
+  },
+  getOrder ({commit}, payload) {
+    return API.graphql({
+      query: getOrder,
+      variables: {id: payload},
+      authMode: 'AMAZON_COGNITO_USER_POOLS'
+    })
+    .then(response => {
+      commit(GET_ORDER_SUCCESS, response.data.getOrder)
+      return response.data.getOrder
+    })
+    .catch(error => console.log('ERROR FETCHING ORDER', error));
+  },
+  printOrdersByStatus({commit}, payload) {
     API.graphql({
       query: ordersByStatusByUser,
       variables: {
@@ -489,5 +622,21 @@ export const orderActions = {
       console.log('ERROR FETCHING ORDERS', error)
       commit(UPDATE_INVENTORY)
     })
-  }
+  },
+  updateOrder ({commit}, payload) {
+    commit(UPDATE_ORDER)
+    API.graphql({
+      query: updateOrder,
+      variables: { input: payload },
+      authMode: 'AMAZON_COGNITO_USER_POOLS'
+    })
+    .then((response) => { 
+      console.log('UPDATE ORDER SUCCESS', response.data.updateOrder)
+      commit(UPDATE_ORDER_SUCCESS, response.data.updateOrder)
+    })
+    .catch(error => { 
+      console.log('ERROR UPDATING ORDER', error)
+      commit(UPDATE_ORDER_FAILURE)
+    });
+  },
 }

@@ -206,6 +206,11 @@ export default {
 				await this.products.forEach(product => {
 					const item = this.inventoryItems.find(item => item.code===product.code)
 					if(item) {
+						if(item.price!==product.price) {
+							console.log('UPDATE PRODUCT PRICE', item.name, product.price, item.price)
+							this.$store.dispatch('updateProduct', { id:product.id, price: item.price })
+						}
+
 						if(item.stock === undefined || item.stock < 0)
 							item.stock = 0
 						if(product.inventory.stock!==item.stock) {

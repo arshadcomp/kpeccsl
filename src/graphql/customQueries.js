@@ -72,7 +72,7 @@ export const listProducts = /* GraphQL */ `
   }
 `;
 
-export const searchProducts = /* GraphQL */ `
+export const listProductsWithName = /* GraphQL */ `
   query ListProducts(
     $filter: ModelProductFilterInput
     $limit: Int
@@ -82,29 +82,21 @@ export const searchProducts = /* GraphQL */ `
       items {
         id
         keyword
-        name
-        description
-        hsn
-        code
-        tax
-        mrp
-        purchase_rate
-        rate
-        gst
-        price
-        image
-        unit
-        leastCount
-        featured
-        quantity
-        createdAt
-        updatedAt
-        inventory {
-          id
-          stock
-          createdAt
-          updatedAt
-        }
+      }
+      nextToken
+    }
+  }
+`;
+
+export const searchProducts = /* GraphQL */ `
+  query ListProducts(
+    $filter: ModelProductFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listProducts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
       }
       nextToken
     }
@@ -153,6 +145,54 @@ export const listOrders = /* GraphQL */ `
     }
   }
 `;
+
+export const productByCode = /* GraphQL */ `
+  query ProductByCode(
+    $code: String
+    $sortDirection: ModelSortDirection
+    $filter: ModelProductFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    productByCode(
+      code: $code
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        keyword
+        name
+        description
+        hsn
+        code
+        tax
+        mrp
+        purchase_rate
+        rate
+        gst
+        price
+        image
+        unit
+        leastCount
+        featured
+        quantity
+        createdAt
+        updatedAt
+        inventory {
+          id
+          stock
+          createdAt
+          updatedAt
+        }
+      }
+      nextToken
+    }
+  }
+`;
+
 export const ordersByStatusByUser = /* GraphQL */ `
   query OrdersbyStatusByUser(
     $status: Status
@@ -176,6 +216,10 @@ export const ordersByStatusByUser = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        history {
+          name
+          createdAt
+        }
         items {
           id
           name

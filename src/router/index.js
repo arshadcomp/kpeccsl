@@ -18,6 +18,8 @@ import Orders from '@/pages/Orders';
 import ProductView from '@/pages/product/View';
 import OrderView from '@/pages/order/View';
 
+import Profile from '@/pages/Profile';
+
 import AdminRoutes from './admin'
 // import ProfileRoutes from './profile'
 // import CartRoutes from './cart'
@@ -51,6 +53,14 @@ const router = new Router({
       path: '/cart',
       name: 'Cart',
       component: Cart,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: Profile,
       meta: {
         requiresAuth: true
       }

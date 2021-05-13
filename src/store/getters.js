@@ -19,17 +19,40 @@ export const userGetters = {
 		return state.isAdmin
 	},
 	name: (state, getters) => id => {
-		const user = getters.userById(id)
-		return user ? user.UserAttributes.find(u => u.Name==='name').Value : ''
+		// const user = getters.userById(id)
+		return getters.attributeFromUser(getters.userById(id), 'name')
+		// return user ? user.UserAttributes.find(u => u.Name==='name').Value : ''
 	},
 	address: (state, getters) => id => {
-		const user = getters.userById(id)
-		return user ? user.UserAttributes.find(u => u.Name==='address').Value+' Kaiga Township, Mallapur, Uttara Kannada, Karanatka-581400' : ''
+		return getters.attributeFromUser(getters.userById(id), 'address')
+		// const user = getters.userById(id)
+		// return user ? user.UserAttributes.find(u => u.Name==='address').Value+' Kaiga Township, Mallapur, Uttara Kannada, Karanatka-581400' : ''
 	},
 	phone: (state, getters) => id => {
-		const user = getters.userById(id)
-		return user ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
-	}
+		return getters.attributeFromUser(getters.userById(id), 'phone_number')
+		// const user = getters.userById(id)
+		// return user ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
+	},
+	area: (state, getters) => id => {
+		return getters.attributeFromUser(getters.userById(id), 'custom:Area')
+		// const user = getters.userById(id)
+		// return user ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
+	},
+	attributeFromUser: () => (user, attribute) => {
+		let name = ''
+		if(user && user.UserAttributes)
+			name = user.UserAttributes.find(u => u.Name===attribute)
+		if(name!==undefined)
+			return name.Value
+		return ''
+		// return user && user.UserAttributes && user.UserAttributes.length === 7 ? user.UserAttributes.find(u => u.Name==='name').Value : ''
+	},
+	// addressFromUser: () => user => {
+	// 	return user && user.UserAttributes && user.UserAttributes.length === 7 ? user.UserAttributes.find(u => u.Name==='address').Value : ''
+	// },
+	// phoneFromUser: () => user => {
+	// 	return user && user.UserAttributes && user.UserAttributes.length === 7 ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
+	// },
 }
 
 export const productGetters = {
@@ -41,6 +64,10 @@ export const productGetters = {
 	},
 	productsWithStock: (state) => {
 		return state.products.filter(p => p.inventory.stock > 0)
+	},
+	productsSortedByName: (state) => {
+		let products = JSON.parse(JSON.stringify(state.products))
+		return products.sort((p1, p2)=> p1.keyword.localeCompare(p2.keyword) )
 	},
 	product: (state) => {
 		return state.product
@@ -94,4 +121,7 @@ export const orderGetters = {
 	orderById: (state) => id => {
 		return state.orders.find(o => o.id===id)
 	},
+	nextToken: (state) => {
+		return state.nextToken
+	}
 }
