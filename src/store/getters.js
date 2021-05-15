@@ -80,8 +80,8 @@ export const productGetters = {
 	productById: (state) => id => {
 		return state.products.find(p => p.id === id)
 	},
-	productcategories: (state) => {
-		return state.productCategories
+	productCategories: (state) => {
+		return state.productCategories.sort((c1,c2) => c1.name.localeCompare(c2.name))
 	},
 	productCategory: (state) => hsn => {
 		return state.productCategories.find(c => c.hsn.includes(hsn))

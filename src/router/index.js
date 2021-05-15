@@ -8,7 +8,7 @@ import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import Logout from '@/pages/Logout';
 
-import Search from '@/pages/Search';
+import Search from '@/pages/Find';
 import Cart from '@/pages/Cart';
 
 // import About from '@/pages/About';

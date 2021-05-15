@@ -246,6 +246,9 @@ export const productActions = {
     commit(ALL_PRODUCTS)
     API.graphql({
       query: listProductsWithName,
+      variables: { 
+        limit: 4000
+      },
       authMode: 'API_KEY'
     })
     .then(response => {

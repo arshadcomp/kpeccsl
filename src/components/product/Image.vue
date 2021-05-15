@@ -34,7 +34,7 @@ export default {
 			return this.$store.getters.productCategory(this.hsn ? this.hsn : '')
 		},
 		defaultImg() {
-			if(this.category)
+			if(this.category && this.category.images)
 				// return this.category.images[Math.floor(Math.random() * this.category.images.length)].substring(0,40) + '200x200'
 				return this.category.images[Math.floor(Math.random() * this.category.images.length)]
 			return 'https://source.unsplash.com/Hz4FAtKSLKo/200x200'

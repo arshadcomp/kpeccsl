@@ -82,6 +82,7 @@ export const listProductsWithName = /* GraphQL */ `
       items {
         id
         keyword
+        hsn
       }
       nextToken
     }
