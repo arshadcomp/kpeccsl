@@ -39,7 +39,7 @@ const store = new Vuex.Store({
 
       company: {
         name: 'Kaiga Project Employees Cooperative & Credit Society Limited - Admin Console',
-        shortName: 'KPECCSL'
+        shortName: 'KPECCSL Admin'
       },
       address: ['Kaiga Township', 'Mallapur, Uttara Kannada', 'Karnataka-581400'],
 			telephone: '05452-2225874',
