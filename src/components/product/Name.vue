@@ -1,5 +1,5 @@
 <template>
-	<div :class="this.class">{{name}}</div>
+	<div :class="this.class" v-if="name">{{name.split('*')[0]}}</div>
 </template>
 
 <script>

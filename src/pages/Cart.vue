@@ -40,7 +40,7 @@
 						<Items/>
 
 						<v-btn 
-							v-if="cart.length > 0 && stockAvailable && amount > minCartAmount" 
+							v-if="cart.length > minCartItem && stockAvailable && amount > minCartAmount" 
 							x-large color="warning" 
 							@click="e1 = 2"
 							class="ml-3 ml-md-0"
@@ -155,6 +155,9 @@ export default {
 		},
 		minCartAmount() {
 			return this.$store.state.minCartAmount
+		},
+		minCartItem() {
+			return this.$store.state.minCartItem - 1
 		}
 	},
 	components: {

@@ -1,5 +1,8 @@
 <template>
-	<v-sheet>
+	<v-sheet
+		class="overflow-hidden"
+    style="position: relative;"
+	>
 		<v-navigation-drawer
       v-model="drawer"
 			absolute
@@ -9,15 +12,26 @@
 		
       <v-list dense subheader>
 				<v-subheader>Filters</v-subheader>
-				<v-list-item>
+				<v-checkbox
+					dense
+					v-for="(category, i) in categories"
+					:key="i"
+					v-model="selected"
+					:value="category.hsn"
+				>
+				<template v-slot:label>
+					<span class="text-capitalize">{{category.name.toLowerCase()}}</span>
+				</template>
+				</v-checkbox>
+				<!-- <v-list-item>
 					<v-switch
 						v-model="withStock"
 						:label="stockSwitchLabel"
 					></v-switch>
-				</v-list-item>
+				</v-list-item> -->
 				
-				<v-alert dense border="left" color="error" dark>Other filters are still under development</v-alert>
-        <v-list-item v-for="category in categories" :key="category">
+				<!-- <v-alert dense border="left" color="error" dark>Other filters are still under development</v-alert> -->
+        <!-- <v-list-item v-for="category in categories" :key="category">
 					<template v-slot:default="{ active }">
 						<v-list-item-action>
 							<v-checkbox :input-value="active"></v-checkbox>
@@ -27,7 +41,7 @@
 							<v-list-item-title>{{category}}</v-list-item-title>
 						</v-list-item-content>
 					</template>
-				</v-list-item>
+				</v-list-item> -->
       </v-list>
     </v-navigation-drawer>
 
@@ -38,7 +52,7 @@
 				color="primary"
 				dark
 				@click.stop="drawer = !drawer"
-				class="d-flex d-sm-none"
+				class="d-flex"
 			>
 				Filter
 			</v-btn>
@@ -60,108 +74,134 @@
 		></v-text-field>
 		
 		<v-list v-if="$vuetify.breakpoint.mobile" three-line>
-			
-			<v-list-item v-for="product in filteredProducts" :key="product.id" class="px-0" @click="goto(product.id)">
+			<v-list-item v-for="product in displayedProducts" :key="product.id" class="px-0" @click="goto(product.id)">
 				<ProductItem :id="product.id"/>
 			</v-list-item>
+			<v-pagination
+				v-model="page"
+				:length="numberOfPages"
+			></v-pagination>
 		</v-list>
 
-		<v-container fluid class="px-0" v-else>
-			<p>Result</p>
+		<v-container fluid v-else>
 			<v-row>
+				<v-col cols="3">
+					Filter
+					<v-checkbox
+						dense
+						v-for="(category, i) in categories"
+						:key="i"
+						v-model="selected"
+						:value="category.hsn"
+					>
+					<template v-slot:label>
+						<span class="text-capitalize">{{category.name.toLowerCase()}}</span>
+					</template>
+					</v-checkbox>
+				</v-col>
+				<v-col cols="9">
+					<v-container fluid>
+						<v-row>
+							<v-col
+								v-for="product in displayedProducts"
+								:key="product.id"
+								cols="4"
+							>
+								<ProductItem :id="product.id"/>
+							</v-col>
+						</v-row>
+						<v-row>
+							<v-col class="pa-6">
+								<v-pagination
+									v-model="page"
+									:length="numberOfPages"
+								></v-pagination>
+							</v-col>
+						</v-row>
+					</v-container>
+				</v-col>
+			</v-row>
+
+			<!-- <v-row>
 				<v-col
-          v-for="product in filteredProducts"
+          v-for="product in displayedProducts"
           :key="product.id"
 					cols="3"
         >
 					<ProductItem :id="product.id"/>
 				</v-col>
 			</v-row>
+			<v-row>
+				<v-col>
+					<v-pagination
+						v-model="page"
+						:length="numberOfPages"
+					></v-pagination>
+				</v-col>
+			</v-row> -->
 		</v-container>
-
-
-		<!-- <v-row>
-			<v-col :sm="12" :md="9">
-				<v-row>
-					<v-col>
-						<ProductItems :withStock="withStock" />
-					</v-col>
-				</v-row>
-			</v-col>
-			<v-col :md="3" class="d-none d-md-flex">
-				
-				<v-list
-					flat
-					subheader
-				>
-					<v-subheader>Filters</v-subheader>
-					<v-switch
-						v-model="withStock"
-						:label="stockSwitchLabel"
-					></v-switch>
-					<v-alert dense border="left" color="error" dark>Other Filters are still under development</v-alert>
-					<v-list-item>
-					</v-list-item>
-					<v-list-item v-for="category in categories" :key="category">
-						<template v-slot:default="{ active }">
-							<v-list-item-action>
-								<v-checkbox :input-value="active"></v-checkbox>
-							</v-list-item-action>
-
-							<v-list-item-content>
-								<v-list-item-title>{{category}}</v-list-item-title>
-							</v-list-item-content>
-						</template>
-					</v-list-item>
-				</v-list>
-
-			</v-col>
-		</v-row> -->
 	</v-sheet>
 </template>
 
 <script>
 import ProductItem from '@/components/product/ItemById'
-// import ProductItems from '@/components/product/Items'
 
 export default {
 	name: 'search',
 	async created() {
-		if(this.$store.getters.products.length === 0)
-			await this.$store.dispatch('productsWithName')
+		await this.$store.dispatch('productsWithName')
+		this.$store.dispatch('productCategories')
 	},
-	// mounted() {
-	// 	this.filteredProducts = this.$store.getters.productsSortedByName
-	// },
 	data() {
 		return {
-			// filteredProducts: [],
 			query: '',
+			page: 1,
+			perPage: 12,
+			numberOfPages: 1,
+			pages: [],
+
 			drawer: false,
 			withStock: false,
-			categories: [
-				'Baby Products',
-				'Grocery',
-				'Appliances',
-				'Home Furnishing'
-			]
+
+			selected: []
+			// categories: [
+			// 	'Baby Products',
+			// 	'Grocery',
+			// 	'Appliances',
+			// 	'Home Furnishing'
+			// ]
 		}
 	},
 	watch: {
 		group () {
 			this.drawer = false
 		},
+		filteredProducts() {
+			this.setNumberOfPages()
+		},
+		selected() {
+			this.search()
+			this.drawer = false
+		}
 	},
 	computed: {
 		stockSwitchLabel() {
 			return this.withStock ? 'Include Out of Stock' : 'Remove Out of Stock'
 		},
-		filteredProducts() {
+		sortedProducts() {
 			return this.$store.getters.productsSortedByName
+		},
+		filteredProducts() {
+			return this.search()
+		},
+		displayedProducts() {
+			return this.paginate(this.filteredProducts)
+		},
+		categories() {
+			return this.$store.getters.productCategories
 		}
 	},
 	components: {
-		// ProductItems,
 		ProductItem
 	},
 	methods: {
@@ -169,8 +209,29 @@ export default {
 			this.query = ''
 		},
 		search() {
-			this.$store.dispatch('searchProducts', this.query.toLowerCase())
-		}
+			if(this.query)
+				return this.sortedProducts.filter(p => p.keyword.includes(this.query.toLowerCase()))
+			
+			if(this.selected.length > 0){
+				let categories = this.selected.join(' ')
+				return this.sortedProducts.filter(p => categories.includes(p.hsn))
+			}
+
+			return this.sortedProducts
+		},
+		setNumberOfPages() {
+			if(this.filteredProducts && this.filteredProducts.length > 0)
+				this.numberOfPages = Math.ceil(this.filteredProducts.length/this.perPage)
+			else
+				this.numberOfPages = 1
+		},
+		paginate (products) {
+      let page = this.page;
+      let perPage = this.perPage;
+      let from = (page * perPage) - perPage;
+      let to = (page * perPage);
+      return  products.slice(from, to);
+    }
 	}
 }
 </script>

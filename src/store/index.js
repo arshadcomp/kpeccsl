@@ -35,6 +35,7 @@ const store = new Vuex.Store({
       nextToken: null,
 
       minCartAmount: 500,
+      minCartItem: 5,
 
       company: {
         name: 'Kaiga Project Employees Cooperative & Credit Society Limited',
