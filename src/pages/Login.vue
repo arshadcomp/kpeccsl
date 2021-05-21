@@ -1,5 +1,15 @@
 <template>
-  <v-row>
+  <div>
+    <amplify-authenticator username-alias="email">
+      <amplify-sign-up
+        slot="sign-up"
+        username-alias="email"
+        :form-fields.prop="formFields"
+      ></amplify-sign-up>
+      <amplify-sign-in slot="sign-in" username-alias="email"></amplify-sign-in>
+    </amplify-authenticator>
+  </div>
+  <!-- <v-row>
     <v-col class="pt-0 pt-md-16">
       <v-card
         class="mx-auto mx-n6 mx-md-auto mt-6 mt-md-16"
@@ -47,7 +57,7 @@
       <amplify-sign-in slot="sign-in" username-alias="email"></amplify-sign-in>
     </amplify-authenticator>
     </v-col>
-  </v-row>
+  </v-row> -->
 </template>
 
 <style>
@@ -90,14 +100,19 @@ export default {
           label: 'Quarter No. (Kaiga Township)',
           placeholder: 'Quarter No.',
           required: true,
-        },
+        }
+        // {
+        //   type: 'number',
+        //   // key: 'employee_no',
+        //   label: 'Employee No',
+        //   placeholder: 'Employee No',
+        //   required: false,
+        //   custom: true
+        // },
       ],
       signInFields: [
         {
-          type: 'phone_number',
-          label: 'Mobile No',
-          dialCode: '+91',
-          placeholder: 'Mobile No',
+          type: 'email',
           required: true,
         },
         {

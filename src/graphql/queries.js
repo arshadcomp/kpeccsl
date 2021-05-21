@@ -25,6 +25,7 @@ export const getProduct = /* GraphQL */ `
         gstin
       }
       quantity
+      sellerID
       createdAt
       updatedAt
       inventory {
@@ -61,6 +62,7 @@ export const listProducts = /* GraphQL */ `
         leastCount
         featured
         quantity
+        sellerID
         createdAt
         updatedAt
       }
@@ -132,6 +134,7 @@ export const productByCode = /* GraphQL */ `
         leastCount
         featured
         quantity
+        sellerID
         createdAt
         updatedAt
       }
@@ -265,6 +268,16 @@ export const ordersbyUserByTime = /* GraphQL */ `
     }
   }
 `;
+export const getInventory = /* GraphQL */ `
+  query GetInventory($id: ID!) {
+    getInventory(id: $id) {
+      id
+      stock
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const listInventorys = /* GraphQL */ `
   query ListInventorys(
     $filter: ModelInventoryFilterInput
@@ -279,16 +292,6 @@ export const listInventorys = /* GraphQL */ `
         updatedAt
       }
       nextToken
-    }
-  }
-`;
-export const getInventory = /* GraphQL */ `
-  query GetInventory($id: ID!) {
-    getInventory(id: $id) {
-      id
-      stock
-      createdAt
-      updatedAt
     }
   }
 `;

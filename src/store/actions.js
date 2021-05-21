@@ -133,8 +133,10 @@ export const userActions = {
     commit(SHOW_LOADER)
     const user = await Auth.currentAuthenticatedUser();
     Auth.updateUserAttributes(user, {
+      'name': payload.name,
+      'custom:employee_no': payload['custom:employee_no'],
       'address': payload.address,
-      'custom:Area': payload['custom:Area']
+      'custom:area': payload['custom:area']
     })
     .then( () => {
       commit(UPDATE_USER_SUCCESS, payload)
@@ -491,6 +493,7 @@ export const orderActions = {
       delete item.gst
       delete item.leastCount
       delete item.seller
+      delete item.sellerID
       delete item.featured
       delete item.inventory
       delete item.createdAt

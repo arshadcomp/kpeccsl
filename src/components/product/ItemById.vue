@@ -25,7 +25,7 @@
 		:loading="loading"
 		
 		@click="cardClicked"
-		max-width="320"
+		width="280"
 	>
 		<template slot="progress">
 			<v-progress-linear

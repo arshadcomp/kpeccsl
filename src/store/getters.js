@@ -19,24 +19,19 @@ export const userGetters = {
 		return state.isAdmin
 	},
 	name: (state, getters) => id => {
-		// const user = getters.userById(id)
 		return getters.attributeFromUser(getters.userById(id), 'name')
-		// return user ? user.UserAttributes.find(u => u.Name==='name').Value : ''
 	},
 	address: (state, getters) => id => {
 		return getters.attributeFromUser(getters.userById(id), 'address')
-		// const user = getters.userById(id)
-		// return user ? user.UserAttributes.find(u => u.Name==='address').Value+' Kaiga Township, Mallapur, Uttara Kannada, Karanatka-581400' : ''
+	},
+	employee_no: (state, getters) => id => {
+		return getters.attributeFromUser(getters.userById(id), 'custom:employee_no')
 	},
 	phone: (state, getters) => id => {
 		return getters.attributeFromUser(getters.userById(id), 'phone_number')
-		// const user = getters.userById(id)
-		// return user ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
 	},
 	area: (state, getters) => id => {
-		return getters.attributeFromUser(getters.userById(id), 'custom:Area')
-		// const user = getters.userById(id)
-		// return user ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
+		return getters.attributeFromUser(getters.userById(id), 'custom:area')
 	},
 	attributeFromUser: () => (user, attribute) => {
 		let name = ''
@@ -45,14 +40,7 @@ export const userGetters = {
 		if(name!==undefined)
 			return name.Value
 		return ''
-		// return user && user.UserAttributes && user.UserAttributes.length === 7 ? user.UserAttributes.find(u => u.Name==='name').Value : ''
 	},
-	// addressFromUser: () => user => {
-	// 	return user && user.UserAttributes && user.UserAttributes.length === 7 ? user.UserAttributes.find(u => u.Name==='address').Value : ''
-	// },
-	// phoneFromUser: () => user => {
-	// 	return user && user.UserAttributes && user.UserAttributes.length === 7 ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
-	// },
 }
 
 export const productGetters = {
@@ -81,7 +69,8 @@ export const productGetters = {
 		return state.products.find(p => p.id === id)
 	},
 	productCategories: (state) => {
-		return state.productCategories.sort((c1,c2) => c1.name.localeCompare(c2.name))
+		let categories = JSON.parse(JSON.stringify(state.productCategories))
+		return categories.sort((c1,c2) => c1.name.localeCompare(c2.name))
 	},
 	productCategory: (state) => hsn => {
 		return state.productCategories.find(c => c.hsn.includes(hsn))

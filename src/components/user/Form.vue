@@ -19,6 +19,12 @@
 			></v-text-field>
 
 			<v-text-field
+				v-model="user['custom:employee_no']"
+				:counter="10"
+				label="Employee No"
+			></v-text-field>
+
+			<v-text-field
 				v-model="user.address"
 				:counter="10"
 				:rules="addressRules"
@@ -27,7 +33,7 @@
 			></v-text-field>
 
 			<v-select
-				v-model="user['custom:Area']"
+				v-model="user['custom:area']"
 				:items="items"
 				:rules="[v => !!v || 'Area is required']"
 				label="Area"
@@ -69,8 +75,12 @@
       // name: '',
       nameRules: [
         v => !!v || 'Name is required',
-        v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+        v => (v && v.length <= 40) || 'Name must be less than 10 characters',
 			],
+			// employeeRules: [
+      //   v => !!v || 'Employee No is required',
+      //   v => (v && v.length <= 40) || 'Employee Number must be less than 10 characters',
+			// ],
 			addressRules: [
         v => !!v || 'Address is required',
         v => (v && v.length <= 10) || 'Name must be less than 10 characters',

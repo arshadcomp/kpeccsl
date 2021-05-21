@@ -25,6 +25,7 @@ export const onCreateProduct = /* GraphQL */ `
         gstin
       }
       quantity
+      sellerID
       createdAt
       updatedAt
       inventory {
@@ -60,6 +61,7 @@ export const onUpdateProduct = /* GraphQL */ `
         gstin
       }
       quantity
+      sellerID
       createdAt
       updatedAt
       inventory {
@@ -95,6 +97,7 @@ export const onDeleteProduct = /* GraphQL */ `
         gstin
       }
       quantity
+      sellerID
       createdAt
       updatedAt
       inventory {

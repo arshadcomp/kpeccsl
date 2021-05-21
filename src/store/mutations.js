@@ -73,9 +73,12 @@ export const userMutations = {
 		state.showLoader = false
 	},
 	[UPDATE_USER_SUCCESS] (state, payload) {
+		state.user.attributes.name = payload.name
 		state.user.attributes.address = payload.address
-		if(payload['custom:Area'])
-			state.user.attributes['custom:Area'] = payload['custom:Area']
+		if(payload['custom:area'])
+			state.user.attributes['custom:area'] = payload['custom:area']
+		if(payload['custom:employee_no'])
+			state.user.attributes['custom:employee_no'] = payload['custom:employee_no']
 		state.showLoader = false
 	}
 }
@@ -157,7 +160,7 @@ export const cartMutations = {
 			payload.image = payload.image+'/200x200'
 		else {
 			const category = state.productCategories.find(c => c.hsn.includes(payload.hsn))
-			if(category)
+			if(category && category.images)
 					payload.image = category.images[Math.floor(Math.random() * category.images.length)].substr(0,40)+'200x200'
 			else
 				payload.image =  'https://source.unsplash.com/Hz4FAtKSLKo/200x200'

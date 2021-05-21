@@ -1,11 +1,17 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import VuexPersistence from 'vuex-persist'
 
 import { appGetters, userGetters, productGetters, cartGetters, orderGetters } from './getters'
 import { appMutations, userMutations, productMutations, cartMutations, orderMutations } from './mutations'
 import { appActions, userActions, productActions, cartActions, orderActions } from './actions'
 
 Vue.use(Vuex);
+
+const vuexLocal = new VuexPersistence({
+  storage: window.localStorage,
+  reducer: (state) => ({cart:  state.cart})
+})
 
 const store = new Vuex.Store({
     strict: true,
@@ -48,6 +54,7 @@ const store = new Vuex.Store({
       helpEmail: 'arshad.comp@gmail.com',
       helpWhatsapp: '+91-8277749766'
     },
+    plugins: [vuexLocal.plugin],
     getters: Object.assign({}, appGetters, userGetters, productGetters, cartGetters, orderGetters),
     mutations: Object.assign({}, appMutations, userMutations, productMutations, cartMutations, orderMutations),
     actions: Object.assign({}, appActions, userActions, productActions, cartActions, orderActions)

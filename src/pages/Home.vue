@@ -2,7 +2,7 @@
 	<v-sheet>
 		<Caraousel/>
 
-		<v-alert
+		<!-- <v-alert
 			border="left"
 			color="error"
 			:icon="$vuetify.breakpoint.mobile ? false : 'mdi-account'"
@@ -11,20 +11,33 @@
 		>
 			<h2>Profile Update</h2>
 			<p>Please update your area in the Profile section after login. This will help us better manage our deliveries.</p>
-		</v-alert>
+		</v-alert> -->
 
 		<v-alert
 			border="left"
-			color="indigo"
+			color="error"
 			:icon="$vuetify.breakpoint.mobile ? false : 'mdi-package'"
 			dark
 			prominent
 		>
-			<h2>Limited Stock</h2>
-			<p>Since its just the begining we have loaded the app with limited number of items which will increase in coming days.</p>
+			<h2>Technical Error</h2>
+			<p>Due to a glitch in server, a few user ID's have changed. If you are not able to login, please create a new account. We really apologise for the inconvenience.</p>
 		</v-alert>
 
-		<div v-for="list in featuredLists" :key="list.name" class="mb-12">
+		<v-row v-if="products">
+			<v-col v-for="product in products" :key="product.id">
+				<ProductItem :id="product.id" />
+			</v-col>
+		</v-row>
+		
+		
+		<!-- <v-list v-if="products" three-line>
+			<v-list-item v-for="product in products" :key="product.id" class="px-0" @click="goto(product.id)">
+				<ProductItem :id="product.id"/>
+			</v-list-item>
+		</v-list> -->
+
+		<!-- <div v-for="list in featuredLists" :key="list.name" class="mb-12">
 			<div class="mb-3 d-flex justify-space-between align-center">
 				<v-subheader class="text-uppercase">{{list.name.split('_').join(' ') }}</v-subheader>
 				<v-btn text to="/search">
@@ -37,7 +50,7 @@
 					<ProductItem :id="id" />
 				</v-col>
 			</v-row>
-		</div>
+		</div> -->
 
 		<!-- <ProductItems /> -->
 
@@ -74,18 +87,26 @@ import Caraousel from '@/components/Carousel'
 
 export default {
 	name: 'home',
-	created() {
-		// if(this.$store.state.products.length == 0)
-		// 	this.$store.dispatch('allProducts')
-		if(this.$store.state.productCategories.length === 0)
-			this.$store.dispatch('productCategories')
-		if(this.$store.state.featuredLists.length === 0)
-			this.$store.dispatch('featuredLists')
+	async created() {
+		if(this.$store.state.products.length < 12)
+			await this.$store.dispatch('productsWithName')
+		// this.$store.dispatch('productCategories')
 	},
+	// created() {
+	// 	// if(this.$store.state.products.length == 0)
+	// 	// 	this.$store.dispatch('allProducts')
+	// 	if(this.$store.state.productCategories.length === 0)
+	// 		this.$store.dispatch('productCategories')
+	// 	if(this.$store.state.featuredLists.length === 0)
+	// 		this.$store.dispatch('featuredLists')
+	// },
 	computed: {
-		featuredLists() {
-			return this.$store.getters.featuredLists
-		}
+		// featuredLists() {
+		// 	return this.$store.getters.featuredLists
+		// }
+		products() {
+			return this.$store.getters.productsSortedByName.length > 12 ? this.getRandom(this.$store.getters.productsSortedByName, 12) : null
+		},
 	},
 	components: {
 		Caraousel,
@@ -96,6 +117,19 @@ export default {
 		searchQuery: ''
 	}),
 	methods: {
+		getRandom(arr, n) {
+			var result = new Array(n),
+					len = arr.length,
+					taken = new Array(len);
+			if (n > len)
+					throw new RangeError("getRandom: more elements taken than available");
+			while (n--) {
+					var x = Math.floor(Math.random() * len);
+					result[n] = arr[x in taken ? taken[x] : x];
+					taken[x] = --len in taken ? taken[len] : len;
+			}
+			return result;
+		}
 	}
 }
 </script>
