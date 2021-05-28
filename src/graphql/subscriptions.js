@@ -164,6 +164,7 @@ export const onCreateOrder = /* GraphQL */ `
         status
       }
       owner
+      sellerID
       createdAt
       updatedAt
     }
@@ -188,6 +189,7 @@ export const onUpdateOrder = /* GraphQL */ `
         status
       }
       owner
+      sellerID
       createdAt
       updatedAt
     }
@@ -212,6 +214,7 @@ export const onDeleteOrder = /* GraphQL */ `
         status
       }
       owner
+      sellerID
       createdAt
       updatedAt
     }

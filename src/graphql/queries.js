@@ -61,10 +61,20 @@ export const listProducts = /* GraphQL */ `
         unit
         leastCount
         featured
+        seller {
+          name
+          gstin
+        }
         quantity
         sellerID
         createdAt
         updatedAt
+        inventory {
+          id
+          stock
+          createdAt
+          updatedAt
+        }
       }
       nextToken
     }
@@ -133,10 +143,20 @@ export const productByCode = /* GraphQL */ `
         unit
         leastCount
         featured
+        seller {
+          name
+          gstin
+        }
         quantity
         sellerID
         createdAt
         updatedAt
+        inventory {
+          id
+          stock
+          createdAt
+          updatedAt
+        }
       }
       nextToken
     }
@@ -161,6 +181,7 @@ export const getOrder = /* GraphQL */ `
         status
       }
       owner
+      sellerID
       createdAt
       updatedAt
     }
@@ -176,7 +197,21 @@ export const listOrders = /* GraphQL */ `
       items {
         id
         status
+        history {
+          name
+          createdAt
+        }
+        items {
+          id
+          name
+          image
+          quantity
+          price
+          unit
+          status
+        }
         owner
+        sellerID
         createdAt
         updatedAt
       }
@@ -204,7 +239,21 @@ export const ordersbyStatusByUser = /* GraphQL */ `
       items {
         id
         status
+        history {
+          name
+          createdAt
+        }
+        items {
+          id
+          name
+          image
+          quantity
+          price
+          unit
+          status
+        }
         owner
+        sellerID
         createdAt
         updatedAt
       }
@@ -232,7 +281,21 @@ export const ordersbyStatusByUserByTime = /* GraphQL */ `
       items {
         id
         status
+        history {
+          name
+          createdAt
+        }
+        items {
+          id
+          name
+          image
+          quantity
+          price
+          unit
+          status
+        }
         owner
+        sellerID
         createdAt
         updatedAt
       }
@@ -260,7 +323,21 @@ export const ordersbyUserByTime = /* GraphQL */ `
       items {
         id
         status
+        history {
+          name
+          createdAt
+        }
+        items {
+          id
+          name
+          image
+          quantity
+          price
+          unit
+          status
+        }
         owner
+        sellerID
         createdAt
         updatedAt
       }

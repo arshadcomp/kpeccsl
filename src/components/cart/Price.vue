@@ -24,10 +24,17 @@
 				</v-list-item-icon>
 			</v-list-item>
 			<v-divider></v-divider>
-			<v-list-item v-if="amount > minCartAmount" >
+			<!-- <v-list-item v-if="amount > minCartAmount" > -->
+			<v-list-item>
 				<v-list-item-title>Delivery Charges</v-list-item-title>
 				<v-list-item-icon class="green--text">
-					FREE
+					<!-- {{deliveryCharge}} -->
+				</v-list-item-icon>
+			</v-list-item>
+			<v-list-item v-for="bag in bags" :key="bag.seller.id" dense>
+				<v-list-item-title><small>{{bag.seller.name}}</small></v-list-item-title>
+				<v-list-item-icon class="green--text">
+					&#8377;{{deliveryCharge(bag)}}
 				</v-list-item-icon>
 			</v-list-item>
 			<v-divider></v-divider>
@@ -41,7 +48,7 @@
 				<v-card-title> Total Amount </v-card-title>
 			</v-card>
 			<v-card flat>
-				<v-card-title> &#8377; {{ amount }} </v-card-title>
+				<v-card-title> &#8377; {{ totalBagsAmount }} </v-card-title>
 			</v-card>
 
 		</v-card>
@@ -67,9 +74,13 @@
 <script>
 export default {
 	name: 'CartPrice',
+	created() {
+		this.createBags()
+	},
 	data() {
 		return {
-			cart: this.$store.state.cart
+			cart: this.$store.state.cart,
+			bags: []
 		}
 	},
 	computed: {
@@ -82,6 +93,38 @@ export default {
 		},
 		minCartAmount() {
 			return this.$store.state.minCartAmount
+		},
+		totalBagsAmount() {
+			return this.bags.reduce((total, bag) => { return total + bag.items.reduce((amount,item) => { return amount + item.price*item.quantity},0 ) + this.deliveryCharge(bag) }, 0 )
+		}
+	},
+	methods: {
+		createBags() {
+			let bags = []
+			let seller = {}
+			let index
+			this.cart.forEach(item => {
+				seller.id = item.sellerID ? item.sellerID : 1
+				index = bags.findIndex(bag => bag.seller.id === seller.id)
+				if(index===-1) {
+					bags.push({seller: this.$store.getters.sellerById(item.sellerID ? item.sellerID : 1), items: [item] })
+				} else {
+					bags[index].items.push(item)
+				}
+			})
+			this.bags = bags
+		},
+		deliveryCharge(bag) {
+			const amount = bag.items.reduce((amount,item) => { return amount + item.price*item.quantity},0 )
+			const index = bag.seller.deliveryCharge.find(el => amount > el.min && amount < el.max)
+			console.log('CHARGE INDEX', index)
+			return index.charge
+		},
+		
+	},
+	watch: {
+		cart() {
+			this.createBags()
 		}
 	}
 }

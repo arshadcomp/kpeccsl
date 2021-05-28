@@ -185,6 +185,7 @@ export const createOrder = /* GraphQL */ `
         status
       }
       owner
+      sellerID
       createdAt
       updatedAt
     }
@@ -212,6 +213,7 @@ export const updateOrder = /* GraphQL */ `
         status
       }
       owner
+      sellerID
       createdAt
       updatedAt
     }
@@ -239,6 +241,7 @@ export const deleteOrder = /* GraphQL */ `
         status
       }
       owner
+      sellerID
       createdAt
       updatedAt
     }

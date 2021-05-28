@@ -5,6 +5,12 @@
 export const appGetters = {
 	loader: (state) => {
 		return state.showLoader
+	},
+	sellers: (state) => {
+		return state.sellers
+	},
+	sellerById: (state) => id => {
+		return state.sellers.find(s => s.id===id)
 	}
 }
 
@@ -61,9 +67,16 @@ export const productGetters = {
 		return state.product
 	},
 	featuredProducts: (state) => {
-		if (state.products.length > 0) {
-			return state.products.filter(p => p.featured === true)
-		}
+		// console.log('PROD', state.products)
+		// const featured = state.products.filter(p => p.featured === 'true')
+		// console.log('FEAT PROD', featured)
+		// if (state.products.length > 0) {
+			return state.products.filter(p => p.featured === true).slice(0,12)
+		// }
+	},
+	latestProducts: (state) => {
+		let products = JSON.parse(JSON.stringify(state.products))
+		return products.sort((p1,p2) => p1.createdAt < p2.createdAt).slice(0,12)
 	},
 	productById: (state) => id => {
 		return state.products.find(p => p.id === id)

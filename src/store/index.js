@@ -43,6 +43,55 @@ const store = new Vuex.Store({
       minCartAmount: 500,
       minCartItem: 5,
 
+      sellers: [
+        {
+          id: 1,
+          name: 'KPECCSL',
+          address: 'Kaiga Township',
+          gstin: '29AAAAK3464F1ZO',
+          minCartAmount: 500,
+          minCartItem: 5,
+          deliveryCharge: [
+            {min: 1, max: 100000, charge: 0},
+          ]
+        },
+        {
+          id: 12,
+          name: 'KPECCSL Milk Counter',
+          address: 'Kaiga Township',
+          gstin: '29AAAAK3464F1ZO',
+          minCartAmount: 500,
+          minCartItem: 5,
+        },
+        {
+          id: 13,
+          name: 'KPECCSL Petrol Pump',
+          address: 'Kaiga Township',
+          gstin: '29AAAAK3464F1ZO',
+          minCartAmount: 500,
+          minCartItem: 5,
+        },
+        {
+          id: 17,
+          name: 'Paraga Farmer Produce Company Limited',
+          address: 'Sirsi',
+          gstin: 'dummy-29AAAAK3464F1ZO',
+          minCartAmount: 1,
+          minCartItem: 1,
+          deliveryCharge: [
+            {min: 1, max: 500, charge: 20},
+            {min: 500, max: 750, charge: 10},
+            {min: 750, max: 100000, charge: 0},
+          ]
+        },
+        {
+          id: 10,
+          userId: '54907741-7a42-4c09-9466-8e83ad0920ff',
+          name: 'Dummy Seller',
+          address: 'Kaiga Township',
+        }
+      ],
+
       company: {
         name: 'Kaiga Project Employees Cooperative & Credit Society Limited',
         shortName: 'KPECCSL'

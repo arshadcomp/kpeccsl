@@ -89,10 +89,16 @@
 					<v-btn small color="primary" :to="'/product/'+item.id" outlined class="mb-3">
 						<v-icon small>mdi-star</v-icon> REVIEW
 					</v-btn>
-					<small>FREE DELIVERY</small>
+					<!-- <small>FREE DELIVERY</small> -->
 				</v-list-item-action>
 
 			</v-list-item>
+			<!-- <p class="text-right text-lg-h6 pr-4">
+				Item Amount: &#8377; {{ amount }}
+			</p> -->
+			<p class="text-right pr-4">
+				Delivery Charge: <span class="error--text">May be applicable</span> 
+			</p>
 			<p class="text-right text-lg-h6 pr-4">
 				Total: &#8377; {{ order.items.reduce((total, item) => { return total + item.price*item.quantity}, 0) }}
 			</p>
@@ -117,6 +123,16 @@ export default {
 		User,
 		ProductImage,
 	},
+	computed: {
+		// amount() {
+		// 	return order.items.reduce((total, item) => { return total + item.price*item.quantity}, 0)
+		// },
+		// deliveryCharge() {
+		// 	const product = this.$store.dispatch('getProduct', order.items[0].id)
+		// 	console.log('PRODUCT IN ORDER', product)
+
+		// }
+	},
 	methods: {
 		goto(order) {
 			this.$router.push('/order/'+order.id)
@@ -131,6 +147,7 @@ export default {
 			console.log('UPDATE ORDER STATUS',this.status ,this.history)
 			this.$store.dispatch('updateOrder', {id: this.order.id, status: this.status, history: this.history })
 		},
+		
 	},
 }
 </script>

@@ -5,13 +5,16 @@
   >
     <v-list-item three-line>
       <v-list-item-content>
-        <div class="overline mb-4">
+        <div class="overline">
           {{product.name}}
         </div>
+				<div class="mb-4">
+					<small>Seller: {{product.seller ? product.seller.name : 'KPECCSL'}}</small>
+				</div>
         <v-list-item-title class="headline mb-1">
           &#8377; {{product.price}}
         </v-list-item-title>
-        <v-list-item-subtitle>Delivery in 1-2 day | <span class="green--text">Free</span></v-list-item-subtitle>
+        <v-list-item-subtitle>Delivery in 1-2 day <!--| <span class="green--text">Free</span>--> </v-list-item-subtitle>
       </v-list-item-content>
 
       <v-list-item-avatar

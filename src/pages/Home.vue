@@ -24,6 +24,25 @@
 			<p>Due to a glitch in server, a few user ID's have changed. If you are not able to login, please create a new account. We really apologise for the inconvenience.</p>
 		</v-alert>
 
+		<div class="mb-6">
+			<h3>Featured Products</h3>
+			<v-row v-if="featuredProducts.length > 0">
+				<v-col v-for="product in featuredProducts" :key="product.id">
+					<ProductItem :id="product.id" />
+				</v-col>
+			</v-row>
+		</div>
+
+		<div class="mb-6">
+			<h3>New Arrivals</h3>
+			<v-row v-if="latestProducts.length > 0">
+				<v-col v-for="product in latestProducts" :key="product.id">
+					<ProductItem :id="product.id" />
+				</v-col>
+			</v-row>
+		</div>
+
+		<h3>Random Selection</h3>
 		<v-row v-if="products">
 			<v-col v-for="product in products" :key="product.id">
 				<ProductItem :id="product.id" />
@@ -101,9 +120,12 @@ export default {
 	// 		this.$store.dispatch('featuredLists')
 	// },
 	computed: {
-		// featuredLists() {
-		// 	return this.$store.getters.featuredLists
-		// }
+		featuredProducts() {
+			return this.$store.getters.featuredProducts
+		},
+		latestProducts() {
+			return this.$store.getters.latestProducts
+		},
 		products() {
 			return this.$store.getters.productsSortedByName.length > 12 ? this.getRandom(this.$store.getters.productsSortedByName, 12) : null
 		},
