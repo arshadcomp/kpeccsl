@@ -33,7 +33,7 @@ export const getProduct = /* GraphQL */ `
     }
   }
 `;
-export const listProducts = /* GraphQL */ `
+export const listProductsWithInventory = /* GraphQL */ `
   query ListProducts(
     $filter: ModelProductFilterInput
     $limit: Int
@@ -215,6 +215,7 @@ export const ordersByStatusByUser = /* GraphQL */ `
         id
         status
         owner
+        sellerID
         createdAt
         updatedAt
         history {

@@ -28,6 +28,7 @@ export const createProduct = /* GraphQL */ `
         gstin
       }
       quantity
+      sellerID
       createdAt
       updatedAt
       inventory {
@@ -66,6 +67,7 @@ export const updateProduct = /* GraphQL */ `
         gstin
       }
       quantity
+      sellerID
       createdAt
       updatedAt
       inventory {
@@ -104,6 +106,7 @@ export const deleteProduct = /* GraphQL */ `
         gstin
       }
       quantity
+      sellerID
       createdAt
       updatedAt
       inventory {
@@ -125,6 +128,8 @@ export const createCategory = /* GraphQL */ `
       name
       hsn
       images
+      image
+      parentId
       createdAt
       updatedAt
     }
@@ -140,6 +145,8 @@ export const updateCategory = /* GraphQL */ `
       name
       hsn
       images
+      image
+      parentId
       createdAt
       updatedAt
     }

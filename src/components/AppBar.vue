@@ -1,115 +1,43 @@
 <template>
-	<v-app-bar
-		app
-		color="primary"
-		dark
-	>
-	<!-- <v-app-bar-nav-icon class="d-flex d-md-none" @click.stop="$emit('toggle-drawer')"></v-app-bar-nav-icon> -->
-	<!-- src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png" -->
+	<v-app-bar app color="error" dark clipped-left>
 		<div class="d-flex align-center">
-			<v-avatar color="white" rounded>
-				<v-img
-					alt="KPECCSL Logo"
-					class="shrink"
-					contain
-					src="https://kpeccsla899646943534aa39c34c64fd72f84ad100548-dev.s3.ap-south-1.amazonaws.com/public/logo.png"
-					transition="scale-transition"
-					width="40"
-				/>
-			</v-avatar>
-			<!-- <v-img
-				alt="KPECCSL Logo"
-				class="shrink mr-2"
-				contain
-				src="https://kpeccsla899646943534aa39c34c64fd72f84ad100548-dev.s3.ap-south-1.amazonaws.com/public/logo.png"
-				transition="scale-transition"
-				width="40"
-			/> -->
-			<v-toolbar-title>
-				<v-btn
-					to="/"
-					text
-					depressed
-				>
-					<span  class="d-flex d-md-none">{{this.$store.state.company.shortName}}</span>
-					<span  class="d-none d-md-flex">{{this.$store.state.company.name}}</span> 
-				</v-btn>
-				
-			</v-toolbar-title>
+			<v-btn text to="/">
+				<v-avatar color="white" rounded class="mr-2">
+					<v-img
+						alt="KPECCSL Logo"
+						class="shrink"
+						contain
+						src="https://kpeccsla899646943534aa39c34c64fd72f84ad82108-prod.s3.ap-south-1.amazonaws.com/public/logo.png"
+						transition="scale-transition"
+						width="40"
+					/>
+				</v-avatar>
+				<span v-if="company">
+					{{ company.name.full }}
+				</span>
+			</v-btn>
 		</div>
 
 		<v-spacer></v-spacer>
 
 		<v-btn
-			v-if="!this.$store.state.authorized && !$vuetify.breakpoint.mobile"
+			href="https://github.com/vuetifyjs/vuetify/releases/latest"
+			target="_blank"
 			text
-			outlined
-			to="/login"
 		>
-		LOGIN
+			<span class="mr-2">Latest Release</span>
+			<v-icon>mdi-open-in-new</v-icon>
 		</v-btn>
-
-		<v-btn
-			to="/search"
-			text
-			:small="$vuetify.breakpoint.mobile"
-		>	
-			<v-icon>mdi-magnify</v-icon>
-		</v-btn>
-
-		<v-btn
-			to="/cart"
-			text
-			small
-		>	
-			<v-badge
-				:content="cart.length"
-				:value="cart.length"
-				color="error"
-				overlap
-			>
-				<v-icon>mdi-cart</v-icon>
-			</v-badge>
-		</v-btn>
-
-		<v-btn
-			v-if="this.$store.state.authorized"
-			text
-			:small="$vuetify.breakpoint.mobile"
-			@click="toggleDrawer"
-		>
-			<v-icon>mdi-account-circle</v-icon>
-		</v-btn>
-		<v-btn
-			v-else
-			text
-			:small="$vuetify.breakpoint.mobile"
-			@click="toggleDrawer"
-		>
-			<v-icon>mdi-login</v-icon>
-		</v-btn>
-		<!-- <v-app-bar-nav-icon @click.stop="$emit('toggle-drawer')"></v-app-bar-nav-icon> -->
 	</v-app-bar>
 </template>
 
 <script>
-  export default {
-		name: 'AppBar',
-		data: () => ({
-		}),
-		computed: {
-			cart() {
-				return this.$store.getters.cart
-			},
-			drawer() {
-				return this.$store.state.drawer
-			}
-		},
-		methods: {
-			toggleDrawer() {
-				console.log('drawer', this.drawer)
-				this.$store.dispatch('toggleDrawer')
-			}
+export default {
+	name: "app-bar",
+	computed: {
+		company() {
+			return this.$store.getters.company
 		}
-  }
+	}
+};
 </script>

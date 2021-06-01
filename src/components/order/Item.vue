@@ -123,7 +123,7 @@ export default {
 		},
 		getDate(createdAt) {
 			let date = new Date(createdAt)
-			return date.getDate()+'-'+date.getMonth()+'-'+date.getFullYear()+' '+date.getHours()+':'+date.getMinutes()
+			return date.getDate()+'-'+(date.getMonth()+1)+'-'+date.getFullYear()+' '+date.getHours()+':'+date.getMinutes()
 		},
 		updateStatus() {
 			this.history = JSON.parse(JSON.stringify(this.order.history))

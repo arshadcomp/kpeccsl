@@ -34,6 +34,31 @@
 		</v-list>
 	</div>
 	<div v-else>
+		<div v-if="orders && admin" class="mb-6">
+			<h5>Order Summary</h5>
+			<v-data-table
+				:headers="headers"
+				:items="orders"
+				:items-per-page="100"
+				class="elevation-1"
+			>
+			<template v-slot:[`item.index`]="{ item }">
+				{{ orders.map(function(x) {return x.id; }).indexOf(item.id) + 1 }}
+			</template>
+			<template v-slot:[`item.owner`]="{ item }">
+				{{ $store.getters.name(item.owner) }}
+			</template>
+			<template v-slot:[`item.address`]="{ item }">
+				{{ $store.getters.address(item.owner) }}
+			</template>
+			<template v-slot:[`item.phone`]="{ item }">
+				{{ $store.getters.phone(item.owner) }}
+			</template>
+			<template v-slot:[`item.items`]="{ item }">
+					{{ item.items.reduce((total, item) => { return total + item.price*item.quantity}, 0).toFixed(2) }}
+			</template>
+			</v-data-table>
+		</div>
 		<v-row v-if="orders && admin">
 			<v-col v-for="order in orders" :key="order.id">
 				<Item :order="order" :admin="admin" :showAddress="showAddress"/>
@@ -68,6 +93,7 @@
 
 <script>
 // import User from '@/components/user/OrderProfile'
+// import UserName from '@/components/user/NameById'
 // import ProductImage from '@/components/product/Image.vue'
 import Item from '@/components/order/Item'
 import PrintOrderList from '@/components/order/Print'
@@ -77,7 +103,24 @@ export default {
 	props: ['showAddress', 'admin', 'status'],
 	data() {
 		return {
-			dialog: false
+			dialog: false,
+			headers: [
+				{
+					text: 'Sr No',
+					value: 'index',
+				},
+				{
+					text: 'Name',
+					align: 'start',
+					sortable: false,
+					value: 'owner',
+				},
+				{ text: 'Address', value: 'address' },
+				{ text: 'Phone No', value: 'phone' },
+				{ text: 'Items', value: 'items.length' },
+				{ text: 'Amount', value: 'items' },
+				{ text: 'Cash', value: '' },
+			]
 		}
 	},
 	computed: {
@@ -101,10 +144,14 @@ export default {
 			console.log('NEXT TOKEN', this.nextToken)
 			console.log('NEXT TOKEN', this.status)
 			this.$store.dispatch('ordersByStatus', { status: this.status, nextToken: this.nextToken })
+		},
+		total(items) {
+			return items.reduce((total, item) => { return total + item.price*item.quantity}, 0)
 		}
 	},
 	components: {
 		// User,
+		// UserName,
 		// ProductImage,
 		Item,
 		PrintOrderList

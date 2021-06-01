@@ -1,56 +1,51 @@
 <template>
-	<v-row class="mb-3">
-		<v-col cols="12" md="4">
-			<v-skeleton-loader
-				v-if="this.loading"
-				class="mx-auto"
-				type="card"
-			></v-skeleton-loader>
-			<ProductImage v-if="!this.loading" :imageUrl="product.image" class="mb-3" />
-			<ProductButton v-if="!this.loading" :id="product.id" :stock="product.inventory.stock" />
-		</v-col>
-		<v-col cols="12" md="8" class="pt-md-6">
-			<ProductName :name="product.name" class="mb-3" />
-			<ProductPrice :product="product" class="mb-3" />
-			<ProductDescription/>
-			<Review/>
-		</v-col>
-	</v-row>
+	<v-card v-if="loaded">
+		<v-row>
+			<v-col cols="4">
+				<ProductImage :imgUrl="product.image" :hsn="product.hsn" large />
+			</v-col>
+			<v-col cols="8">
+				<h2>{{ product.name }}</h2>
+				<p>Stock: {{ product.inventory.stock }}</p>
+				<v-card-actions>
+					<v-btn @click="update" color="primary"> UPDATE </v-btn>
+				</v-card-actions>
+			</v-col>
+		</v-row>
+	</v-card>
+	<v-skeleton-loader
+		v-else
+		class="mx-auto"
+		max-width="300"
+		type="card"
+	></v-skeleton-loader>
 </template>
 
 <script>
-import ProductImage from '@/components/product/Image'
-import ProductName from '@/components/product/Name'
-import ProductPrice from '@/components/product/Price'
-import ProductButton from '@/components/product/Button'
-import ProductDescription from '@/components/product/Description'
-import Review from '@/components/product/Review'
-
+import ProductImage from "@/components/product/Image";
 
 export default {
-	name: 'view-product',
-	created() {
-		if(this.$store.state.product.id!==this.$route.params.id)
-			this.$store.dispatch('getProduct', this.$route.params.id)
+	name: "product-view",
+	mounted() {
+		if (this.product === undefined || this.product.inventory === undefined)
+			this.$store.dispatch("getProduct", this.product.id);
 	},
 	computed: {
-		loading() {
-			return this.$store.state.showLoader
-		},
 		product() {
-			return this.$store.getters.product
+			return this.$store.getters.product;
 		},
-		featured() {
-			return this.product.featured ? 'Featured' : null
-		}
+		loaded() {
+			return this.product && this.product.inventory;
+		},
+	},
+	methods: {
+		update() {
+			this.$store.commit("SET_PRODUCT", this.product);
+			this.$router.push({ name: "ProductUpdate" });
+		},
 	},
 	components: {
 		ProductImage,
-		ProductName,
-		ProductPrice,
-		ProductButton,
-		ProductDescription,
-		Review
-	}
-}
+	},
+};
 </script>

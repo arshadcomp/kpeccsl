@@ -1,6 +1,9 @@
 <template>
   <v-footer
 		color="indigo text--lighten-1"
+    app
+    inset
+    absolute
     padless
   >
     <v-row
@@ -52,7 +55,7 @@
         cols="12"
       >
         <small>Developed By: <a mailto="arshad.comp@gmail.com"></a>arshad.comp@gmail.com</small><br>
-        <v-icon class="white--text">mdi-copyright</v-icon> 1991 - {{ new Date().getFullYear() }} — <strong>{{companyName}}</strong>
+        <v-icon class="white--text">mdi-copyright</v-icon> 1991 - {{ new Date().getFullYear() }} — <strong v-if="company">{{company.name.full}}</strong>
       </v-col>
     </v-row>
   </v-footer>
@@ -61,8 +64,8 @@
 <script>
   export default {
     computed: {
-      companyName() {
-        return this.$vuetify.breakpoint.mobile ? this.$store.state.company.shortName : this.$store.state.company.name
+      company() {
+        return this.$store.getters.company
       }
     },
     data: () => ({

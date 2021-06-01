@@ -1,86 +1,188 @@
 <template>
-	<div v-if="$vuetify.breakpoint.mobile">
-		<div class="d-flex flex-no-wrap justify-space-between">				
-			<v-list-item-avatar
-				size="80"
-				color="grey"
-				rounded
-			>
-			<ProductImage :imageUrl="product.image" :hsn="product.hsn"/>
-			</v-list-item-avatar>
-			<v-list-item-content>
-				<!-- <ProductName :name="product.name" class="mb-3" /> -->
-				<v-list-item-subtitle class="text-truncate">
-					<!-- <ProductName :name="product.name" :truncate=true class="mb-3" /> -->
-					{{product.name}}
-				</v-list-item-subtitle>
-				<v-list-item-title>
-					<ProductPrice :product="product" class="mb-3" />
-					<!-- <span class="black--text font-weight-black mr-3">&#8377; {{product.price}}</span>
-					<span class="grey--text text-decoration-line-through mr-3">{{product.mrp}}</span>
-					<span class="green--text">{{ Math.floor(((product.mrp - product.price)/product.mrp)*100) }}% off </span> -->
-				</v-list-item-title>
-				<ProductButton v-if="product.inventory" :id="product.id" :stock="product.inventory.stock" />
-			</v-list-item-content>
-		</div>
-		<v-divider></v-divider>
-	</div>
-	<v-card
-		v-else
-		:loading="loading"
-		@click="cardClicked"
-	>
-		<template slot="progress">
-			<v-progress-linear
-				color="deep-purple"
-				height="10"
-				indeterminate
-			></v-progress-linear>
-		</template>
+	<v-card v-if="loaded" width="300">
+		<ProductImage :imgUrl="product.image" :hsn="product.hsn" />
+		<v-card-text class="pa-1">
+			<v-list dense>
+				<v-list-item three-line>
+					<v-list-item-content>
+						<v-list-item-subtitle>
+							{{ product.name }}
+						</v-list-item-subtitle>
+					</v-list-item-content>
+				</v-list-item>
+				<v-divider></v-divider>
 
-		<ProductImage :imageUrl="product.image" :hsn="product.hsn"/>
-		
-		<v-card-title> <ProductName :name="product.name" :truncate=true /></v-card-title>
-		<!-- <ProductName :name="product.name" class="mb-3" /> -->
-		<!-- <v-subheader class="black--text">{{product.name}}</v-subheader> -->
-		<v-card-text>
-			<ProductPrice :product="product" class="mb-3" />
-			<!-- <h3>
-				<span class="black--text font-weight-black mr-3">&#8377; {{product.price}}</span>
-				<span class="grey--text text-decoration-line-through mr-3">{{product.mrp}}</span>
-				<span class="green--text">{{ Math.floor(((product.mrp - product.price)/product.mrp)*100) }}% off </span>
-			</h3> -->
-			<!-- <v-subheader>Stock: {{product.inventory.stock}}</v-subheader> -->
+				<v-list-item>
+					<v-list-item-icon>
+						<small>Seller</small>
+					</v-list-item-icon>
+					<v-list-item-content>
+						<v-list-item-title>
+							<small class="text--success">{{ seller.name  }}</small> 
+						</v-list-item-title>
+					</v-list-item-content>
+				</v-list-item>
+				<v-divider></v-divider>
+
+				<v-list-item>
+					<v-list-item-content>
+						<v-list-item-subtitle class="text-right">{{
+							product.id
+						}}</v-list-item-subtitle>
+					</v-list-item-content>
+				</v-list-item>
+				<v-divider></v-divider>
+
+				<v-list-item>
+					<v-list-item-icon>
+						<v-icon small color="indigo"> mdi-barcode </v-icon>
+					</v-list-item-icon>
+					<v-list-item-content>
+						<v-list-item-title>Code</v-list-item-title>
+					</v-list-item-content>
+					<v-list-item-content>
+						<v-list-item-subtitle class="text-right">{{
+							product.code
+						}}</v-list-item-subtitle>
+					</v-list-item-content>
+				</v-list-item>
+				<v-divider></v-divider>
+
+				<v-list-item>
+					<v-list-item-icon>
+						<v-icon small color="indigo"> mdi-currency-inr </v-icon>
+					</v-list-item-icon>
+					<v-list-item-content>
+						<v-list-item-title>Price</v-list-item-title>
+					</v-list-item-content>
+					<v-list-item-content>
+						<v-list-item-subtitle class="text-right">{{
+							product.price
+						}}</v-list-item-subtitle>
+					</v-list-item-content>
+				</v-list-item>
+				<v-divider></v-divider>
+
+				<v-list-item>
+					<v-list-item-icon>
+						<v-icon small color="indigo"> mdi-tray-full</v-icon>
+					</v-list-item-icon>
+					<v-list-item-content>
+						<v-list-item-title>Stock</v-list-item-title>
+					</v-list-item-content>
+					<v-list-item-content>
+						<v-list-item-subtitle class="text-right">{{
+							product.inventory.stock
+						}}</v-list-item-subtitle>
+					</v-list-item-content>
+				</v-list-item>
+				<v-divider></v-divider>
+
+				<v-list-item>
+					<v-list-item-icon>
+						<v-icon small color="indigo"> mdi-currency-inr </v-icon>
+					</v-list-item-icon>
+					<v-list-item-content>
+						<v-list-item-title>HSN</v-list-item-title>
+					</v-list-item-content>
+					<v-list-item-content>
+						<v-list-item-subtitle class="text-right">{{
+							product.hsn
+						}}</v-list-item-subtitle>
+					</v-list-item-content>
+				</v-list-item>
+				<v-divider></v-divider>
+			</v-list>
 		</v-card-text>
-		<v-divider class="mx-4"></v-divider>
-		<ProductButton v-if="product.inventory" :id="product.id" :stock="product.inventory.stock" />
-		
-		<!-- <ProductButton :product="product" /> -->
+		<v-card-actions>
+			<v-btn color="secondary" small @click="view"> VIEW </v-btn>
+			<v-btn color="secondary" small @click="update" class="mr-2"> UPDATE </v-btn>
+
+			<v-dialog v-model="dialog" persistent max-width="600px">
+				<template v-slot:activator="{ on, attrs }">
+					<v-btn color="primary" small dark v-bind="attrs" v-on="on">
+						UPDATE STOCK
+					</v-btn>
+				</template>
+				<v-card>
+					<v-card-title>
+						<span class="headline">Update Stock for {{ product.name }}</span>
+					</v-card-title>
+					<v-card-text>
+						<v-text-field
+							label="Stock"
+							v-model = product.inventory.stock
+							required
+						></v-text-field>
+					</v-card-text>
+					<v-card-actions>
+						<v-spacer></v-spacer>
+						<v-btn color="blue darken-1" text @click="dialog = false">
+							Close
+						</v-btn>
+						<v-btn color="blue darken-1" text @click="updateStock">
+							Update
+						</v-btn>
+					</v-card-actions>
+				</v-card>
+			</v-dialog>
+		</v-card-actions>
 	</v-card>
+	<v-skeleton-loader
+		v-else
+		class="mx-auto"
+		max-width="300"
+		type="card"
+	></v-skeleton-loader>
 </template>
 
 <script>
-import ProductName from '@/components/product/Name'
-import ProductImage from '@/components/product/Image.vue'
-import ProductButton from '@/components/product/Button.vue'
-import ProductPrice from '@/components/product/Price'
+import ProductImage from "@/components/product/Image";
 
 export default {
-	name: 'product-item',
-	props: ['product'],
-	components: {
-		ProductImage,
-		ProductButton,
-		ProductPrice,
-		ProductName
+	name: "product-item",
+	props: {
+		id: {
+			type: String,
+			required: true,
+		},
 	},
 	data: () => ({
-		loading: false,
+		dialog: false,
 	}),
+	async mounted() {
+		if (this.product === undefined || this.product.inventory === undefined)
+			await this.$store.dispatch("getProduct", this.product.id);
+	},
+	computed: {
+		product() {
+			// const product = this.$store.getters.productById(this.id)
+			// console.log('PRODUCT', product)
+			return this.$store.getters.productById(this.id);
+		},
+		seller() {
+			return  this.$store.getters.sellerById(this.product.sellerID || 1)
+		},
+		loaded() {
+			return this.product && this.product.inventory;
+		},
+	},
 	methods: {
-		cardClicked() {
-			this.$router.push({path:'/product/'+this.product.id })
+		update() {
+			this.$store.commit("SET_PRODUCT", this.product);
+			this.$router.push({ name: "ProductUpdate" });
+		},
+		view() {
+			this.$store.commit("SET_PRODUCT", this.product);
+			this.$router.push({ path: "/product/view" });
+		},
+		updateStock() {
+			this.dialog = false
+			this.$store.dispatch('updateInventory', { id: this.product.inventory.id, stock: parseFloat(this.product.inventory.stock) })
 		}
-	}
-}
+	},
+	components: {
+		ProductImage,
+	},
+};
 </script>
