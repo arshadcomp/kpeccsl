@@ -24,6 +24,9 @@ export const userGetters = {
 	isAdmin: (state) => {
 		return state.isAdmin
 	},
+	belongsToSeller: (getters) => (id) => {
+		return getters.sellers.find(s => s.employeeIds.includes(id))
+	},
 	name: (state, getters) => id => {
 		return getters.attributeFromUser(getters.userById(id), 'name')
 	},
@@ -122,6 +125,14 @@ export const orderGetters = {
 	},
 	orderById: (state) => id => {
 		return state.orders.find(o => o.id===id)
+	},
+	ordersByStatusBySeller : (state, getters) => status => {
+		const user  = getters.user
+		console.log('USER', user)
+		const belongsToSeller = getters.belongsToSeller(user.attributes.sub)
+		console.log('BELONGS TO SELLER', belongsToSeller)
+		// return state.orders.filter( o => o.status===status )
+		return state.orders.filter( o => o.status===status && o.sellerID===belongsToSeller.id )
 	},
 	nextToken: (state) => {
 		return state.nextToken

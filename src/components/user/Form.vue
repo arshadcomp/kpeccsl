@@ -37,8 +37,14 @@
 				:items="items"
 				:rules="[v => !!v || 'Area is required']"
 				label="Area"
-				required
 			></v-select>
+
+			<v-text-field
+				v-if="canBelongToSeller"
+				v-model="user['custom:seller_id']"
+				:counter="10"
+				label="Seller ID"
+			></v-text-field>
 
 			<!-- <v-checkbox
 				v-model="checkbox"
@@ -70,6 +76,9 @@
   export default {
 		name:'profile-form',
 		props: ['user'],
+		created() {
+			console.log('ORIGINAL USER', this.user)
+		},
 		data: () => ({
       valid: false,
       // name: '',
@@ -102,6 +111,16 @@
       ],
       checkbox: false,
 		}),
+		computed: {
+			canBelongToSeller() {
+				const allowedRoles = ['Root','Admin','Manager','Employee']
+				return this.$store.state.user &&
+					this.$store.state.user.signInUserSession &&
+					this.$store.state.user.signInUserSession.accessToken &&
+					this.$store.state.user.signInUserSession.accessToken.payload['cognito:groups'] &&
+					this.$store.state.user.signInUserSession.accessToken.payload['cognito:groups'].some(role => allowedRoles.includes(role))
+			}
+		},
     methods: {
       validate () {
 				this.$refs.form.validate()

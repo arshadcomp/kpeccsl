@@ -87,6 +87,8 @@ export const getCategory = /* GraphQL */ `
       name
       hsn
       images
+      image
+      parentId
       createdAt
       updatedAt
     }
@@ -104,6 +106,8 @@ export const listCategorys = /* GraphQL */ `
         name
         hsn
         images
+        image
+        parentId
         createdAt
         updatedAt
       }
@@ -181,6 +185,13 @@ export const getOrder = /* GraphQL */ `
         status
       }
       owner
+      customer {
+        address
+        email
+        name
+        phone_number
+        sub
+      }
       sellerID
       createdAt
       updatedAt
@@ -211,6 +222,13 @@ export const listOrders = /* GraphQL */ `
           status
         }
         owner
+        customer {
+          address
+          email
+          name
+          phone_number
+          sub
+        }
         sellerID
         createdAt
         updatedAt
@@ -253,6 +271,13 @@ export const ordersbyStatusByUser = /* GraphQL */ `
           status
         }
         owner
+        customer {
+          address
+          email
+          name
+          phone_number
+          sub
+        }
         sellerID
         createdAt
         updatedAt
@@ -295,6 +320,13 @@ export const ordersbyStatusByUserByTime = /* GraphQL */ `
           status
         }
         owner
+        customer {
+          address
+          email
+          name
+          phone_number
+          sub
+        }
         sellerID
         createdAt
         updatedAt
@@ -337,6 +369,13 @@ export const ordersbyUserByTime = /* GraphQL */ `
           status
         }
         owner
+        customer {
+          address
+          email
+          name
+          phone_number
+          sub
+        }
         sellerID
         createdAt
         updatedAt

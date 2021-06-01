@@ -124,8 +124,10 @@ router.beforeResolve((to, from, next) => {
       next({path: '/login'})
     
     if(to.matched.some(record => record.meta.admin)) {
+      const allowedRoles = ['Root','Admin','Manager','Employee']
       try {
-        if(store.state.user.signInUserSession.accessToken.payload['cognito:groups'].indexOf('admin')!==-1)
+        // if(store.state.user.signInUserSession.accessToken.payload['cognito:groups'].indexOf('admin')!==-1)
+        if(store.state.user.signInUserSession.accessToken.payload['cognito:groups'].some(role => allowedRoles.includes(role)))
           next()
       } catch (error) {
         next({path: '/restricted'})

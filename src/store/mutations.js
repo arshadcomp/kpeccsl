@@ -61,11 +61,28 @@ export const userMutations = {
 		state.authorized = authState === 'signedin' ? true : false;
 	},
 	[SET_AUTH_DATA](state, authData) {
+		const allowedRoles = ['Root','Admin','Manager','Employee']
 		state.user = authData
-		if(authData && authData.signInUserSession && authData.signInUserSession.accessToken && authData.signInUserSession.accessToken.payload && authData.signInUserSession.accessToken.payload['cognito:groups'] && authData.signInUserSession.accessToken.payload['cognito:groups'].indexOf('Admin') > -1) 
+		if(authData && 
+			authData.signInUserSession 
+			&& authData.signInUserSession.accessToken 
+			&& authData.signInUserSession.accessToken.payload 
+			&& authData.signInUserSession.accessToken.payload['cognito:groups'] 
+			&& authData.signInUserSession.accessToken.payload['cognito:groups'].indexOf('Admin') > -1) 
 			state.isAdmin = true
-		else 
+		else
 			state.isAdmin = false
+
+		if(authData && 
+			authData.signInUserSession 
+			&& authData.signInUserSession.accessToken 
+			&& authData.signInUserSession.accessToken.payload 
+			&& authData.signInUserSession.accessToken.payload['cognito:groups'] 
+			&& authData.signInUserSession.accessToken.payload['cognito:groups'].some(role => allowedRoles.includes(role)))
+			state.isEmployee = true
+		else
+			state.isEmployee = false
+
 	},
 	[GET_USER_SUCCESS](state, payload) {
 		if(state.users.findIndex(u => u.Username ===payload.Username) < 0)
@@ -228,9 +245,20 @@ export const orderMutations = {
 	[EMPTY_ORDERS]: (state) => {
 		state.orders = []
 	},
-	[LIST_ORDER_SUCCESS] : (state, payload) => {
+	[LIST_ORDER_SUCCESS] : (state, orders) => {
 		// How to manage if items already existing
-		state.orders = state.orders.concat(payload.items)
+		// state.orders = state.orders.concat(payload.items)
+		orders.items.forEach(o => {
+			if(state.orders.findIndex(s => s.id===o.id) < 0)
+				state.orders.push(o)
+		})
+
+		// state.orders.forEach(s => {
+		// 	const index = orders.findIndex(o => s.id===o.id)
+		// 	if(index < 0)
+		// 		state.orders.push(orders[index])
+		// })
+		// console.log('STATE ORDERS', state.orders)
 	},
 	[NEXT_TOKEN] : (state, payload) => {
 		console.log('NEXT TOKEN', payload)
@@ -239,11 +267,20 @@ export const orderMutations = {
 	[UPDATE_ORDER] : (state) => {
 		state.showLoader = true
 	},
-	[UPDATE_ORDER_SUCCESS] : (state, payload) => {
-		let order = state.orders.find(o => o.id === payload.id)
-		if(order)
-			order.status = payload.status
-		state.showLoader = false
+	// [UPDATE_ORDER_SUCCESS] : (state, payload) => {
+	// 	let order = state.orders.find(o => o.id === payload.id)
+	// 	if(order)
+	// 		order.status = payload.status
+	// 	state.showLoader = false
+	// },
+	[UPDATE_ORDER_SUCCESS]: (state, order) => {
+		state.orders = state.orders.map(o => {
+			if(o.id === order.id){
+				o.status = order.status
+				o.history = order.history
+			}
+			return o
+		})
 	},
 	[UPDATE_ORDER_FAILURE] : (state) => {
 		state.showLoader = false

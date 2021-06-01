@@ -136,7 +136,8 @@ export const userActions = {
       'name': payload.name,
       'custom:employee_no': payload['custom:employee_no'],
       'address': payload.address,
-      'custom:area': payload['custom:area']
+      'custom:area': payload['custom:area'],
+      'custom:seller_id': payload['custom:seller_id']
     })
     .then( () => {
       commit(UPDATE_USER_SUCCESS, payload)
@@ -498,6 +499,14 @@ export const orderActions = {
     })
     order.sellerID = items[0].sellerID
     order.owner = getters.user.attributes.sub
+    const customer = getters.user.attributes
+    order.customer = {
+      address: customer.address,
+      email: customer.email,
+      name: customer.name,
+      phone_number: customer.phone_number,
+      sub: customer.sub
+    }
     console.log('ORDER', order)
 
     API.graphql({

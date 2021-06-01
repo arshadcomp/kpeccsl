@@ -1,17 +1,25 @@
 <template>
   <v-row>
-		<v-col cols="3">
+		<v-col cols="12" lg="3">
 			<v-list>
-				<v-list-item to="/admin/orders">
+				<v-list-item to="/admin/orders" v-if="isAdmin">
 					<v-list-item-icon>
-						<v-icon>mdi-package</v-icon>
+						<v-icon>mdi-package-variant</v-icon>
 					</v-list-item-icon>
 
 					<v-list-item-title>All Orders</v-list-item-title>
 				</v-list-item>
 
+				<v-list-item to="/admin/employee">
+					<v-list-item-icon>
+						<v-icon>mdi-package-variant-closed</v-icon>
+					</v-list-item-icon>
 
-				<v-list-group
+					<v-list-item-title>Orders For Packing/Delivery</v-list-item-title>
+				</v-list-item>
+
+
+				<!-- <v-list-group
 					:value="false"
 					prepend-icon="mdi-account-circle"
 				>
@@ -29,9 +37,9 @@
 							<v-icon v-text="icon"></v-icon>
 						</v-list-item-icon>
 					</v-list-item>
-				</v-list-group>
+				</v-list-group> -->
 
-				<v-list-group
+				<!-- <v-list-group
 					:value="true"
 					prepend-icon="mdi-package"
 				>
@@ -50,20 +58,20 @@
 							<v-icon v-text="icon"></v-icon>
 						</v-list-item-icon>
 					</v-list-item>
-				</v-list-group>
+				</v-list-group> -->
 
-				<v-list-item to="/admin/images">
+				<!-- <v-list-item to="/admin/images">
 					<v-list-item-icon>
 						<v-icon>mdi-image</v-icon>
 					</v-list-item-icon>
 
 					<v-list-item-title>All Images</v-list-item-title>
-				</v-list-item>
+				</v-list-item> -->
 
 
 			</v-list>
 		</v-col>
-		<v-col cols="9">
+		<v-col cols="12" lg="9" class="pa-0">
 			<router-view></router-view>
 		</v-col >
 	</v-row>
@@ -95,5 +103,10 @@ export default {
 			['Delete', 'mdi-delete'],
 		],
 	}),
+	computed: {
+		isAdmin() {
+			return this.$store.getters.isAdmin
+		},
+	}
 }
 </script>
