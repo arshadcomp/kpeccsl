@@ -8,9 +8,11 @@
 
 		<v-data-table
 			:headers="headers"
-			:items="desserts"
+			:items="products"
 			:search="search"
 			sort-by="name"
+			:loading="loader"
+			loading-text="Loading... Please wait"
 			class="elevation-1"
 		>
 			<template v-slot:top>
@@ -25,12 +27,15 @@
 						hide-details
 					></v-text-field>
 					<v-spacer></v-spacer>
+					<v-btn v-if="nextToken" color="warning" class="mr-6" @click="loadMore">
+						LOAD MORE
+					</v-btn>
 					<v-dialog v-model="dialog" max-width="500px">
-						<template v-slot:activator="{ on, attrs }">
+						<!-- <template v-slot:activator="{ on, attrs }">
 							<v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
 								New Item
 							</v-btn>
-						</template>
+						</template> -->
 						<v-card>
 							<v-card-title>
 								<span class="headline">{{ formTitle }}</span>
@@ -39,34 +44,34 @@
 							<v-card-text>
 								<v-container>
 									<v-row>
-										<v-col cols="12" sm="6" md="4">
+										<v-col cols="12" sm="12" md="12">
 											<v-text-field
 												v-model="editedItem.name"
-												label="Dessert name"
+												label="Name"
+											></v-text-field>
+										</v-col>
+										<v-col cols="12" sm="12" md="12">
+											<v-text-field
+												v-model="editedItem.keyword"
+												label="Keyword"
 											></v-text-field>
 										</v-col>
 										<v-col cols="12" sm="6" md="4">
 											<v-text-field
-												v-model="editedItem.calories"
-												label="Calories"
+												v-model="editedItem.hsn"
+												label="HSN"
 											></v-text-field>
 										</v-col>
 										<v-col cols="12" sm="6" md="4">
 											<v-text-field
-												v-model="editedItem.fat"
-												label="Fat (g)"
+												v-model="editedItem.rate"
+												label="Rate"
 											></v-text-field>
 										</v-col>
 										<v-col cols="12" sm="6" md="4">
 											<v-text-field
-												v-model="editedItem.carbs"
-												label="Carbs (g)"
-											></v-text-field>
-										</v-col>
-										<v-col cols="12" sm="6" md="4">
-											<v-text-field
-												v-model="editedItem.protein"
-												label="Protein (g)"
+												v-model="editedItem.price"
+												label="Price"
 											></v-text-field>
 										</v-col>
 									</v-row>
@@ -101,7 +106,7 @@
 					</v-dialog>
 				</v-toolbar>
 			</template>
-			<template v-slot:item.actions="{ item }">
+			<template v-slot:[`item.actions`]="{ item }">
 				<v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
 				<v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
 			</template>
@@ -116,10 +121,8 @@
 
 <script>
 export default {
-	name: "product-list",
-	async created() {
-		console.log(this.products.length);
-		if (this.products.length === 0) await this.$store.dispatch("listProducts");
+	name: "product-table",
+	created() {
 		this.initialize();
 	},
 	data() {
@@ -131,27 +134,26 @@ export default {
 				{ text: "Code", value: "code" },
 				{ text: "HSN", value: "hsn" },
 				{ text: "Name", value: "name" },
-
 				{ text: "keyword", value: "keyword" },
-				// { text: 'Protein (g)', value: 'protein' },
-				// { text: 'Iron (%)', value: 'iron' },
+				{ text: "Rate", value: "rate" },
+				{ text: "Price", value: "price" },
 				{ text: "Actions", value: "actions", sortable: false },
 			],
 			desserts: [],
 			editedIndex: -1,
 			editedItem: {
-				name: "",
-				calories: 0,
-				fat: 0,
-				carbs: 0,
-				protein: 0,
+				name: '',
+				hsn: '',
+				keyword: '',
+				rate: 0,
+				price: 0,
 			},
 			defaultItem: {
-				name: "",
-				calories: 0,
-				fat: 0,
-				carbs: 0,
-				protein: 0,
+				name: '',
+				hsn: '',
+				keyword: '',
+				rate: 0,
+				price: 0,
 			},
 		};
 	},
@@ -161,6 +163,9 @@ export default {
 		},
 		error() {
 			return this.$store.getters.error;
+		},
+		nextToken() {
+			return this.$store.getters.nextToken;
 		},
 		products() {
 			return this.$store.getters.products;
@@ -178,11 +183,18 @@ export default {
 		},
 	},
 	methods: {
-		initialize() {
-			this.desserts = this.products;
+		async initialize() {
+			if (this.products.length === 0) 
+				await this.$store.dispatch("listProducts", {limit: 100, withInventory: false});
+		},
+		loadMore() {
+			this.$store.dispatch("listProducts", {
+				limit: 100,
+				withInventory: false,
+			});
 		},
 		editItem(item) {
-			this.editedIndex = this.desserts.indexOf(item);
+			this.editedIndex = this.products.findIndex(p => p.id===item.id)
 			this.editedItem = Object.assign({}, item);
 			this.dialog = true;
 		},
@@ -214,9 +226,12 @@ export default {
 			});
 		},
 
-		save() {
+		async save() {
 			if (this.editedIndex > -1) {
-				Object.assign(this.desserts[this.editedIndex], this.editedItem);
+				delete this.editedItem.createdAt
+				delete this.editedItem.updatedAt
+				delete this.editedItem.inventory
+				await this.$store.dispatch('updateProduct', this.editedItem)
 			} else {
 				this.desserts.push(this.editedItem);
 			}

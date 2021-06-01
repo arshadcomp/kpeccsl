@@ -5,6 +5,8 @@
 		:items="orders"
 		item-key="id"
 		show-select
+		:loading="loader"
+		loading-text="Loading... Please wait"
 		class="elevation-1 mt-6"
 	>
 		<template v-slot:top>
@@ -66,27 +68,6 @@
 				new Date(item.createdAt).toLocaleTimeString("en-GB")
 			}}
 		</template>
-		<!-- <template v-slot:[`item.name`]="{ item }">
-			{{attributeFromUser(item.customer, 'name')}}
-		</template>
-		<template v-slot:[`item.mobile`]="{ item }">
-			{{mobile(item.customer)}}
-		</template>
-		<template v-slot:[`item.address`]="{ item }">
-			{{address(item.customer)}}
-		</template>
-		<template v-slot:[`item.area`]="{ item }">
-			{{area(item.customer)}}
-		</template>
-		<template v-slot:[`item.itemsCount`]="{ item }">
-			{{
-				item.items
-					.reduce((total, item) => {
-						return total + item.price * item.quantity;
-					}, 0)
-					.toFixed(2)
-			}}
-		</template> -->
 		<template v-slot:[`item.actions`]="{ item }">
 			<v-icon small color="indigo" @click="showItems(item)"> mdi-eye </v-icon>
 		</template>
@@ -101,14 +82,18 @@ export default {
 		this.initiate()
 	},
 	computed: {
-		orders() {
-			// return this.$store.getters.ordersByStatus(this.status);
-			return this.$store.getters.ordersByStatusBySeller(this.status);
+		loader() {
+			return this.$store.getters.loader;
+		},
+		error() {
+			return this.$store.getters.error;
 		},
 		nextToken() {
 			return this.$store.getters.nextToken;
 		},
-		
+		orders() {
+			return this.$store.getters.ordersByStatusBySeller(this.status);
+		}
 	},
 	methods: {
 		async initiate() {
@@ -121,14 +106,8 @@ export default {
 				limit: 10,
 				nextToken: null
 			})
-			
-			// await this.$store.dispatch("listOrdersByStatusWithOwner", {
-			// 	status: this.status,
-			// 	nextToken: null,
-			// });
 		},
 		updateStatus() {
-			console.log("SELECTED", this.selected);
 			console.log("STATUS", this.localStatus);
 			let history = []
 			this.selected.forEach(o => {
@@ -144,10 +123,6 @@ export default {
 				status: this.status,
 				nextToken: this.nextToken,
 			});
-			// this.$store.dispatch("listOrdersByStatusWithOwner", {
-			// 	status: this.status,
-			// 	nextToken: this.nextToken,
-			// });
 		},
 		showItems(orderItem) {
 			console.log("ITEMS", orderItem);
@@ -191,15 +166,12 @@ export default {
 				}
 				doc.text("ORDER ID: " + order.id.toUpperCase(), 10, y);
 				doc.text("DATE & TIME: " + new Date(order.createdAt).toLocaleDateString('en-GB')+' '+new Date(order.createdAt).toLocaleTimeString('en-GB'), 180, y, {align: 'right'});
-				// doc.text(this.$store.getters.attributeFromUser(order.customer, 'name'), 10, y + 6);
 				doc.text(order.customer.name, 10, y + 6);
-				// doc.text(this.$store.getters.attributeFromUser(order.customer, 'address')
 				doc.text(order.customer.address +
 						" Kaiga Township, Mallapur, Uttara Kannada, Karanataka-581400",
 					10,
 					y + 10
 				);
-				// doc.text(this.$store.getters.attributeFromUser(order.customer, 'phone_number'), 10, y + 14);
 				doc.text(order.customer.phone_number, 10, y + 14);
 				doc.text("Total Amount", 10, y + 20);
 				doc.text(
@@ -245,25 +217,6 @@ export default {
 
 			doc.save("KPECCSL.pdf");
 		},
-		// name(customer) {
-		// 	const area = customer.UserAttributes.find(c => c.Name==='name')
-		// 	return area ? area.Value : ''
-		// },
-		// mobile(customer) {
-		// 	const area = customer.UserAttributes.find(c => c.Name==='phone_number')
-		// 	return area ? area.Value : ''
-		// },
-		// address(customer) {
-		// 	const area = customer.UserAttributes.find(c => c.Name==='address')
-		// 	return area ? area.Value : ''
-		// },
-		// area(customer) {
-		// 	const area = customer.UserAttributes.find(c => c.Name==='custom:area')
-		// 	return area ? area.Value : ''
-		// },
-		// attributeFromUser(customer, attribute) {
-		// 	return this.$store.getters.attributeFromUser(customer, attribute)
-		// }
 	},
 	data() {
 		return {
@@ -279,11 +232,6 @@ export default {
 				{ text: "Name", value: "customer.name" },
 				{ text: "Mobile No", value: "customer.phone_number" },
 				{ text: "Address", value: "customer.address" },
-				// { text: "Mobile", value: "mobile", sortable: true },
-				// { text: "Address", value: "address", sortable: true },
-				// { text: "Area", value: "area" },
-				// { text: "Items", value: "items.length" },
-				// { text: "Amount", value: "itemsCount" },
 				{ text: "Actions", value: "actions", sortable: false },
 			],
 			dialog: false,
