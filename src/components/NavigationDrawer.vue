@@ -29,7 +29,7 @@
 					<v-list-item-title>{{item.title}}</v-list-item-title>
 				</v-list-item>
 			</v-list-item-group>
-			<v-list-item v-if="isAdmin" :to="'/admin'" >
+			<v-list-item v-if="canManage" :to="'/admin'" >
 				<v-list-item-icon>
 					<v-icon>mdi-star</v-icon>
 				</v-list-item-icon>
@@ -92,8 +92,8 @@
 			user() {
 				return this.$store.state.user.attributes
 			},
-			isAdmin() {
-				return this.$store.getters.isAdmin 
+			canManage() {
+				return this.$store.getters.isAdmin || this.$store.state.isEmployee
 			},
 			drawer: {
 				get(){

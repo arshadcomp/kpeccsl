@@ -31,7 +31,7 @@
 				<v-col
           v-for="product in products"
           :key="product.id"
-          :cols="$vuetify.breakpoint.mobile ? '12' : '3'"
+          :cols="$vuetify.breakpoint.mobile ? '12' : '4'"
         >
 					<ProductItem :id="product.id"/>
 				</v-col>

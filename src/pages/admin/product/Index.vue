@@ -1,6 +1,6 @@
 <template>
 	<v-sheet>
-		<!-- <div class="mb-3">
+		<div class="mb-3">
 			<h3>Bulk Delete</h3>
 			<v-btn
 				@click="bulkDeleteInvetory"
@@ -15,7 +15,7 @@
 			>
 			DELETE ALL PRODUCTS
 			</v-btn>
-		</div> -->
+		</div>
 
 		<div class="mb-3"> 
 			<h3>Update Products Inventory From Tally</h3>
@@ -175,6 +175,7 @@ export default {
 				// item.name = item.name.trim().substr(0, item.name.indexOf('*'))
 				item.keyword = item.name.toLowerCase().replace(/[0-9]/g, '')
 				item.seller = { gstin: '29AAAAK3464F1ZO', name: 'KPECCSL' }
+				item.sellerID = 1
 				item.leastCount = 1
 				item.featured = false
 				if(item.stock === undefined)

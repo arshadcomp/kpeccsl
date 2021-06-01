@@ -83,6 +83,8 @@ export const listProductsWithName = /* GraphQL */ `
         id
         keyword
         hsn
+        featured
+        createdAt
       }
       nextToken
     }
@@ -215,6 +217,14 @@ export const ordersByStatusByUser = /* GraphQL */ `
         id
         status
         owner
+        customer {
+          address
+          email
+          name
+          phone_number
+          sub
+        }
+        sellerID
         createdAt
         updatedAt
         history {

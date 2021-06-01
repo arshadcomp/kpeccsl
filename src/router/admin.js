@@ -21,6 +21,7 @@ import UpdateProductStock from '@/pages/admin/product/UpdateStock';
 import ListImage from '@/pages/admin/Images';
 
 import Orders from '@/pages/admin/Orders';
+import OrdersForEmployee from '@/pages/admin/OrdersEmployee';
 
 export default {
 	path: '/admin',
@@ -54,6 +55,11 @@ export default {
 			path: 'orders',
 			name: 'AdminOrders',
 			component: Orders
+		},
+		{
+			path: 'employee',
+			name: 'EmployeeOrders',
+			component: OrdersForEmployee
 		},
 		{
 			path: 'images',

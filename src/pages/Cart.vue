@@ -40,7 +40,7 @@
 						<Items/>
 
 						<v-btn 
-							v-if="cart.length > minCartItem && stockAvailable && amount > minCartAmount" 
+							v-if="canPlaceOrder" 
 							x-large color="warning" 
 							@click="e1 = 2"
 							class="ml-3 ml-md-0"
@@ -129,10 +129,12 @@ export default {
 	name: 'Cart',
 	created() {
 		// this.subscribeCreateOrder()
+		this.createBags()
 	},
 	data () {
 		return {
 			e1: 1,
+			bags: []
 			// loading: true
 		}
 	},
@@ -158,6 +160,19 @@ export default {
 		},
 		minCartItem() {
 			return this.$store.state.minCartItem - 1
+		},
+		canPlaceOrder() {
+			// return this.cart.length > this.minCartItem && this.stockAvailable && this.amount > this.minCartAmount
+			// let eachSellerCondition = false
+			console.log('BAGS LENGTH',this.bags.length)
+			this.bags.forEach(bag => {
+				console.log('PLACE ORDER EVERY', bag.seller.minCartAmount, bag.items.reduce((amount, item) => { return amount + (item.price*item.quantity) }, 0))
+			})
+			return this.bags.every((bag) => {
+				console.log('PLACE ORDER', bag.items.length, bag.seller.minCartItem)
+				return (bag.items.length >= bag.seller.minCartItem) && (bag.items.reduce((amount, item) => { return amount + (item.price*item.quantity) }, 0) > bag.seller.minCartAmount)
+				// return bag.seller.minCartAmount > 0
+			})
 		}
 	},
 	components: {
@@ -168,6 +183,30 @@ export default {
 		Payment
 	},
 	methods: {
+		createBags() {
+			let bags = []
+			let bag = { seller: {id: 1}, items: [] }
+			let seller = {}
+			let index
+			// console.log('CART', this.cart)
+			this.cart.forEach(item => {
+				// seller = item.seller ? item.seller : {name: 'KPECCSL'}
+				seller.id = item.sellerID ? item.sellerID : 1
+				index = bags.findIndex(bag => bag.seller.id === seller.id)
+				console.log('BAG INDEX', seller.id, item.sellerID, index)
+				if(index===-1) {
+					// bag.seller = seller
+					// bag.items.push(item)
+					bags.push({seller: this.$store.getters.sellerById(item.sellerID ? item.sellerID : 1), items: [item] })
+					console.log('BAGS -1', bag)
+				} else {
+					bags[index].items.push(item)
+					console.log('BAGS INDEX', item)
+				}
+			})
+			this.bags = bags
+			console.log('BAGS', this.bags)
+		},
 		confirmOrder() {
 			this.createOrder()
 		},
@@ -178,7 +217,10 @@ export default {
 			// 	if(product.stock <=0)
 			// 		delete cart[index]
 			// }
-			this.$store.dispatch('createOrder')
+			this.bags.forEach(bag => {
+				this.$store.dispatch('createOrder', bag.items)
+			})
+			// this.$store.dispatch('createOrder')
 		},
 		// async getProduct(id) {
 		// 	return await this.dispatch('getProductById', id)
@@ -194,6 +236,11 @@ export default {
 		// 		}
 		// 	});
 		// },
+	},
+	watch: {
+		cart() {
+			this.createBags()
+		}
 	}
 }
 </script>

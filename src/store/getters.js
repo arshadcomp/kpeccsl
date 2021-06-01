@@ -5,6 +5,12 @@
 export const appGetters = {
 	loader: (state) => {
 		return state.showLoader
+	},
+	sellers: (state) => {
+		return state.sellers
+	},
+	sellerById: (state) => id => {
+		return state.sellers.find(s => s.id===id)
 	}
 }
 
@@ -18,25 +24,23 @@ export const userGetters = {
 	isAdmin: (state) => {
 		return state.isAdmin
 	},
+	belongsToSeller: (getters) => (id) => {
+		return getters.sellers.find(s => s.employeeIds.includes(id))
+	},
 	name: (state, getters) => id => {
-		// const user = getters.userById(id)
 		return getters.attributeFromUser(getters.userById(id), 'name')
-		// return user ? user.UserAttributes.find(u => u.Name==='name').Value : ''
 	},
 	address: (state, getters) => id => {
 		return getters.attributeFromUser(getters.userById(id), 'address')
-		// const user = getters.userById(id)
-		// return user ? user.UserAttributes.find(u => u.Name==='address').Value+' Kaiga Township, Mallapur, Uttara Kannada, Karanatka-581400' : ''
+	},
+	employee_no: (state, getters) => id => {
+		return getters.attributeFromUser(getters.userById(id), 'custom:employee_no')
 	},
 	phone: (state, getters) => id => {
 		return getters.attributeFromUser(getters.userById(id), 'phone_number')
-		// const user = getters.userById(id)
-		// return user ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
 	},
 	area: (state, getters) => id => {
-		return getters.attributeFromUser(getters.userById(id), 'custom:Area')
-		// const user = getters.userById(id)
-		// return user ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
+		return getters.attributeFromUser(getters.userById(id), 'custom:area')
 	},
 	attributeFromUser: () => (user, attribute) => {
 		let name = ''
@@ -45,14 +49,7 @@ export const userGetters = {
 		if(name!==undefined)
 			return name.Value
 		return ''
-		// return user && user.UserAttributes && user.UserAttributes.length === 7 ? user.UserAttributes.find(u => u.Name==='name').Value : ''
 	},
-	// addressFromUser: () => user => {
-	// 	return user && user.UserAttributes && user.UserAttributes.length === 7 ? user.UserAttributes.find(u => u.Name==='address').Value : ''
-	// },
-	// phoneFromUser: () => user => {
-	// 	return user && user.UserAttributes && user.UserAttributes.length === 7 ? user.UserAttributes.find(u => u.Name==='phone_number').Value : ''
-	// },
 }
 
 export const productGetters = {
@@ -73,15 +70,23 @@ export const productGetters = {
 		return state.product
 	},
 	featuredProducts: (state) => {
-		if (state.products.length > 0) {
-			return state.products.filter(p => p.featured === true)
-		}
+		// console.log('PROD', state.products)
+		// const featured = state.products.filter(p => p.featured === 'true')
+		// console.log('FEAT PROD', featured)
+		// if (state.products.length > 0) {
+			return state.products.filter(p => p.featured === true).slice(0,12)
+		// }
+	},
+	latestProducts: (state) => {
+		let products = JSON.parse(JSON.stringify(state.products))
+		return products.sort((p1,p2) => p1.createdAt < p2.createdAt).slice(0,12)
 	},
 	productById: (state) => id => {
 		return state.products.find(p => p.id === id)
 	},
 	productCategories: (state) => {
-		return state.productCategories.sort((c1,c2) => c1.name.localeCompare(c2.name))
+		let categories = JSON.parse(JSON.stringify(state.productCategories))
+		return categories.sort((c1,c2) => c1.name.localeCompare(c2.name))
 	},
 	productCategory: (state) => hsn => {
 		return state.productCategories.find(c => c.hsn.includes(hsn))
@@ -120,6 +125,14 @@ export const orderGetters = {
 	},
 	orderById: (state) => id => {
 		return state.orders.find(o => o.id===id)
+	},
+	ordersByStatusBySeller : (state, getters) => status => {
+		const user  = getters.user
+		console.log('USER', user)
+		const belongsToSeller = getters.belongsToSeller(user.attributes.sub)
+		console.log('BELONGS TO SELLER', belongsToSeller)
+		// return state.orders.filter( o => o.status===status )
+		return state.orders.filter( o => o.status===status && o.sellerID===belongsToSeller.id )
 	},
 	nextToken: (state) => {
 		return state.nextToken

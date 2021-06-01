@@ -149,7 +149,8 @@ import ProductItem from '@/components/product/ItemById'
 export default {
 	name: 'search',
 	async created() {
-		await this.$store.dispatch('productsWithName')
+		if(this.$store.state.products.length === 0)
+			await this.$store.dispatch('productsWithName')
 		this.$store.dispatch('productCategories')
 	},
 	data() {

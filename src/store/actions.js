@@ -133,8 +133,11 @@ export const userActions = {
     commit(SHOW_LOADER)
     const user = await Auth.currentAuthenticatedUser();
     Auth.updateUserAttributes(user, {
+      'name': payload.name,
+      'custom:employee_no': payload['custom:employee_no'],
       'address': payload.address,
-      'custom:Area': payload['custom:Area']
+      'custom:area': payload['custom:area'],
+      'custom:seller_id': payload['custom:seller_id']
     })
     .then( () => {
       commit(UPDATE_USER_SUCCESS, payload)
@@ -474,7 +477,71 @@ export const cartActions = {
 }
 
 export const orderActions = {
-  createOrder({dispatch, commit, getters}){
+  createOrder({dispatch, commit, getters}, items){
+    commit(CREATE_ORDER)
+    let order = {}
+    order.status = 'CONFIRMED'
+    order.history = [
+      { name: 'PENDING', createdAt: new Date().toISOString() },
+      { name: 'CONFIRMED', createdAt: new Date().toISOString() }
+    ]
+    order.items = []
+    items.forEach(item => {
+      order.items.push({
+        id: item.id,
+        code: item.code,
+        name: item.name, 
+        image: item.image, 
+        quantity: item.quantity, 
+        price: item.price, 
+        unit: item.unit,
+        status:'CONFIRMED'
+      })
+    })
+    order.sellerID = items[0].sellerID
+    order.owner = getters.user.attributes.sub
+    const customer = getters.user.attributes
+    order.customer = {
+      address: customer.address,
+      email: customer.email,
+      name: customer.name,
+      phone_number: customer.phone_number,
+      sub: customer.sub
+    }
+    console.log('ORDER', order)
+
+    API.graphql({
+      query: createOrder,
+      variables: { input: order },
+      authMode: 'AMAZON_COGNITO_USER_POOLS'
+    })
+    .then(response => {
+      let cart = getters.cart
+      let order = response.data.createOrder
+      console.log('CREATE ORDER', response.data.createOrder)
+      cart.forEach((item)=> {
+        API.graphql({
+          query: getInventory,
+          variables: {id: item.inventory.id},
+          authMode: 'API_KEY'
+        })
+        .then(response => {
+          console.log('INVENTORY SUCCESS', response.data.getInventory)
+          dispatch('updateInventory', { id:response.data.getInventory.id, stock: response.data.getInventory.stock - item.quantity })
+        })
+        .catch(error => console.log('ERROR FETCHING INVENTORY', error));
+      })
+      commit(CREATE_ORDER_SUCCESS, order)
+    })
+    .catch(error => {
+      console.log('ERROR CREATING ORDER', error)
+      commit(CREATE_ORDER_FAILURE, error)
+    })
+
+
+
+  },
+  createOrderFor({dispatch, commit, getters}){
     let payload = JSON.parse(JSON.stringify(getters.cart));
     // console.log('ORDER ITEMS', payload)
     payload.forEach((item)=>{ 
@@ -491,6 +558,7 @@ export const orderActions = {
       delete item.gst
       delete item.leastCount
       delete item.seller
+      delete item.sellerID
       delete item.featured
       delete item.inventory
       delete item.createdAt

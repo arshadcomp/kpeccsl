@@ -37,7 +37,7 @@ export default {
   created() {
     Auth.currentAuthenticatedUser()
       .then((user) => {
-        // console.log('USER', user)
+        console.log('USER', user)
         this.$store.commit('SET_AUTH_STATE', 'signedin')
         this.$store.commit('SET_AUTH_DATA', {attributes: user.attributes, signInUserSession: user.signInUserSession})
       }).catch(err => {
