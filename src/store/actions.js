@@ -488,7 +488,8 @@ export const orderActions = {
     order.items = []
     items.forEach(item => {
       order.items.push({
-        id: item.id, 
+        id: item.id,
+        code: item.code,
         name: item.name, 
         image: item.image, 
         quantity: item.quantity, 
