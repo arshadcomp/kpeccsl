@@ -1,52 +1,53 @@
 <template>
-	<v-img v-if="!imgKey && $vuetify.breakpoint.mobile"
-		:src="defaultImg"
-	>
-	</v-img>
-	<v-img
-		v-else-if="!imgKey && !$vuetify.breakpoint.mobile"
-		height="250"
-		:src="defaultImg"
-	>
-	</v-img>
-	<amplify-s3-image v-else-if="imgKey && inS3Storage" :img-key=imgKey />
-	<v-img
-		v-else
-		height="250"
-		:src="imageUrl"
-	></v-img>
+	<amplify-s3-image v-if="inS3Storage" :img-key="imgUrl" />
+	<v-img v-else :src="imgSrc"> </v-img>
 </template>
 
 <style scoped>
 amplify-s3-image {
-  --height: 30rem;
-  --width: 100%;
+	--height: 30rem;
+	--width: 100%;
 }
 </style>
 
 
 <script>
 export default {
-	name: 'product-image',
-	props: ['imageUrl', 'hsn'],
-	computed :{
-		category() {
-			return this.$store.getters.productCategory(this.hsn ? this.hsn : '')
+	name: "product-image",
+	props: {
+		imgUrl: {
+			type: String,
+			required: false,
 		},
-		defaultImg() {
-			if(this.category && this.category.images)
-				// return this.category.images[Math.floor(Math.random() * this.category.images.length)].substring(0,40) + '200x200'
-				return this.category.images[Math.floor(Math.random() * this.category.images.length)]
-			return 'https://source.unsplash.com/Hz4FAtKSLKo/200x200'
+		large: {
+			type: Boolean,
+			default: () => {
+				return false;
+			},
 		},
+		hsn: {
+			type: String,
+			deafult: () => {
+				return "";
+			},
+		},
+	},
+	computed: {
 		inS3Storage() {
-			return !this.imageUrl.includes("http")
+			return this.imgUrl && !this.imgUrl.includes("http");
 		},
-		imgKey() {
-			if(!this.imageUrl)
-				return false
-			return this.imageUrl.trim()
-		}
-	}
-}
+		imgSrc() {
+			let url = "https://source.unsplash.com/Hz4FAtKSLKo";
+			if (this.imgUrl) url = this.imgUrl;
+			// else {
+			// 	const category = this.$store.getters.productCategory(this.hsn);
+			// 	if (category && category.images)
+			// 		url = category.images[
+			// 			Math.floor(Math.random() * category.images.length)
+			// 		];
+			// }
+			return this.large ? url : url + "/400x400";
+		},
+	},
+};
 </script>
