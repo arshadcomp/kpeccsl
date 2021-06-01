@@ -183,6 +183,7 @@ export const createOrder = /* GraphQL */ `
       }
       items {
         id
+        code
         name
         image
         quantity
@@ -218,6 +219,7 @@ export const updateOrder = /* GraphQL */ `
       }
       items {
         id
+        code
         name
         image
         quantity
@@ -253,6 +255,7 @@ export const deleteOrder = /* GraphQL */ `
       }
       items {
         id
+        code
         name
         image
         quantity
