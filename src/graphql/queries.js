@@ -177,6 +177,7 @@ export const getOrder = /* GraphQL */ `
       }
       items {
         id
+        code
         name
         image
         quantity
@@ -214,6 +215,7 @@ export const listOrders = /* GraphQL */ `
         }
         items {
           id
+          code
           name
           image
           quantity
@@ -263,6 +265,7 @@ export const ordersbyStatusByUser = /* GraphQL */ `
         }
         items {
           id
+          code
           name
           image
           quantity
@@ -312,6 +315,7 @@ export const ordersbyStatusByUserByTime = /* GraphQL */ `
         }
         items {
           id
+          code
           name
           image
           quantity
@@ -361,6 +365,7 @@ export const ordersbyUserByTime = /* GraphQL */ `
         }
         items {
           id
+          code
           name
           image
           quantity
