@@ -74,46 +74,46 @@
 <script>
 export default {
 	name: 'CartPrice',
-	created() {
-		this.createBags()
-	},
+	// created() {
+	// 	this.createBags()
+	// },
 	data() {
 		return {
-			cart: this.$store.state.cart,
-			bags: []
+			cart: this.$store.getters.cart,
+			bags: this.$store.getters.bags
 		}
 	},
 	computed: {
-		amount() {
-			let amount = 0;
-			this.cart.forEach(element => {
-				amount = amount + element.price*element.quantity
-			});
-			return amount;
-		},
-		minCartAmount() {
-			return this.$store.state.minCartAmount
-		},
+		// amount() {
+		// 	let amount = 0;
+		// 	this.cart.forEach(element => {
+		// 		amount = amount + element.price*element.quantity
+		// 	});
+		// 	return amount;
+		// },
+		// minCartAmount() {
+		// 	return this.$store.state.minCartAmount
+		// },
 		totalBagsAmount() {
-			return this.bags.reduce((total, bag) => { return total + bag.items.reduce((amount,item) => { return amount + item.price*item.quantity},0 ) + this.deliveryCharge(bag) }, 0 )
+			return this.bags.reduce((total, bag) => { return total + bag.items.reduce((amount,item) => { return amount + item.price*item.quantity},0 ) + this.deliveryCharge(bag) }, 0 ).toFixed(2)
 		}
 	},
 	methods: {
-		createBags() {
-			let bags = []
-			let seller = {}
-			let index
-			this.cart.forEach(item => {
-				seller.id = item.sellerID ? item.sellerID : 1
-				index = bags.findIndex(bag => bag.seller.id === seller.id)
-				if(index===-1) {
-					bags.push({seller: this.$store.getters.sellerById(item.sellerID ? item.sellerID : 1), items: [item] })
-				} else {
-					bags[index].items.push(item)
-				}
-			})
-			this.bags = bags
-		},
+		// createBags() {
+		// 	let bags = []
+		// 	let seller = {}
+		// 	let index
+		// 	this.cart.forEach(item => {
+		// 		seller.id = item.sellerID ? item.sellerID : 1
+		// 		index = bags.findIndex(bag => bag.seller.id === seller.id)
+		// 		if(index===-1) {
+		// 			bags.push({seller: this.$store.getters.sellerById(item.sellerID ? item.sellerID : 1), items: [item] })
+		// 		} else {
+		// 			bags[index].items.push(item)
+		// 		}
+		// 	})
+		// 	this.bags = bags
+		// },
 		deliveryCharge(bag) {
 			const amount = bag.items.reduce((amount,item) => { return amount + item.price*item.quantity},0 )
 			const index = bag.seller.deliveryCharge.find(el => amount > el.min && amount < el.max)
@@ -122,10 +122,10 @@ export default {
 		},
 		
 	},
-	watch: {
-		cart() {
-			this.createBags()
-		}
-	}
+	// watch: {
+	// 	cart() {
+	// 		this.createBags()
+	// 	}
+	// }
 }
 </script>

@@ -25,7 +25,7 @@ export default {
 	name: 'order-confirm',
 	computed: {
 		loading() {
-			return this.$store.state.showLoader
+			return this.$store.getters.loader
 		},
 		order() {
 			return this.$store.getters.order

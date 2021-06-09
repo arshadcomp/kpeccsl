@@ -121,57 +121,56 @@ import Checkout from '@/components/cart/Checkout'
 import Confirm from '@/components/cart/Confirm'
 import Payment from '@/components/cart/Payment'
 
-// import { API } from 'aws-amplify';
-
-// import { onCreateOrder } from '@/graphql/subscriptions';
-
 export default {
 	name: 'Cart',
 	created() {
-		// this.subscribeCreateOrder()
+		this.$store.commit('EMPTY_BAGS')
 		this.createBags()
 	},
 	data () {
 		return {
 			e1: 1,
-			bags: []
+			// bags: []
 			// loading: true
 		}
 	},
 	computed: {
 		loading(){
-			return this.$store.state.showloader
+			return this.$store.getters.loader
 		},
 		cart() {
 			return this.$store.getters.cart
 		},
-		stockAvailable() {
-			return this.cart.every(element => element.quantity > 0 );
+		bags() {
+			return this.$store.getters.bags
 		},
-		amount() {
-			let amount = 0;
-			this.cart.forEach(element => {
-				amount = amount + element.price*element.quantity
-			});
-			return amount;
-		},
-		minCartAmount() {
-			return this.$store.state.minCartAmount
-		},
-		minCartItem() {
-			return this.$store.state.minCartItem - 1
-		},
+		// stockAvailable() {
+		// 	return this.cart.every(element => element.quantity > 0 );
+		// },
+		// amount() {
+		// 	let amount = 0;
+		// 	this.cart.forEach(element => {
+		// 		amount = amount + element.price*element.quantity
+		// 	});
+		// 	return amount.toFixed(2);
+		// },
+		// minCartAmount() {
+		// 	return this.$store.state.minCartAmount
+		// },
+		// minCartItem() {
+		// 	return this.$store.state.minCartItem - 1
+		// },
 		canPlaceOrder() {
-			// return this.cart.length > this.minCartItem && this.stockAvailable && this.amount > this.minCartAmount
-			// let eachSellerCondition = false
 			console.log('BAGS LENGTH',this.bags.length)
 			this.bags.forEach(bag => {
 				console.log('PLACE ORDER EVERY', bag.seller.minCartAmount, bag.items.reduce((amount, item) => { return amount + (item.price*item.quantity) }, 0))
 			})
+			if(this.bags.length === 0) 
+				return false
+
 			return this.bags.every((bag) => {
 				console.log('PLACE ORDER', bag.items.length, bag.seller.minCartItem)
 				return (bag.items.length >= bag.seller.minCartItem) && (bag.items.reduce((amount, item) => { return amount + (item.price*item.quantity) }, 0) > bag.seller.minCartAmount)
-				// return bag.seller.minCartAmount > 0
 			})
 		}
 	},
@@ -184,61 +183,55 @@ export default {
 	},
 	methods: {
 		createBags() {
-			let bags = []
-			let bag = { seller: {id: 1}, items: [] }
 			let seller = {}
-			let index
-			// console.log('CART', this.cart)
 			this.cart.forEach(item => {
-				// seller = item.seller ? item.seller : {name: 'KPECCSL'}
-				seller.id = item.sellerID ? item.sellerID : 1
-				index = bags.findIndex(bag => bag.seller.id === seller.id)
-				console.log('BAG INDEX', seller.id, item.sellerID, index)
-				if(index===-1) {
-					// bag.seller = seller
-					// bag.items.push(item)
-					bags.push({seller: this.$store.getters.sellerById(item.sellerID ? item.sellerID : 1), items: [item] })
-					console.log('BAGS -1', bag)
-				} else {
-					bags[index].items.push(item)
-					console.log('BAGS INDEX', item)
-				}
+				seller.id = item.sellerID || 1
+				this.$store.commit('PUSH_TO_BAG', { seller: this.$store.getters.sellerById(seller.id), item: item })
+				// const index = this.bags.findIndex(bag => bag.seller.id === seller.id)
+				// if(index===-1) {
+				// 	this.$store.commit('ADD_NEW_BAG', { seller: this.$store.getters.sellerById(seller.id), item: item })
+				// 	// this.bags.push({seller: this.$store.getters.sellerById(seller.id), items: [item] })
+				// } else {
+				// 	this.$store.commit('PUSH_ITEM_IN_BAG', { sellerId: seller.id, item: item })
+				// }
 			})
-			this.bags = bags
-			console.log('BAGS', this.bags)
+			console.log('BAGS STORE', this.bags)
+			
+			// let bags = []
+			// let bag = { seller: {id: 1}, items: [] }
+			// let seller = {}
+			// let index
+			// // console.log('CART', this.cart)
+			// this.cart.forEach(item => {
+			// 	// seller = item.seller ? item.seller : {name: 'KPECCSL'}
+			// 	seller.id = item.sellerID ? item.sellerID : 1
+			// 	index = bags.findIndex(bag => bag.seller.id === seller.id)
+			// 	console.log('BAG INDEX', seller.id, item.sellerID, index)
+			// 	if(index===-1) {
+			// 		// bag.seller = seller
+			// 		// bag.items.push(item)
+			// 		bags.push({seller: this.$store.getters.sellerById(item.sellerID ? item.sellerID : 1), items: [item] })
+			// 		console.log('BAGS -1', bag)
+			// 	} else {
+			// 		bags[index].items.push(item)
+			// 		console.log('BAGS INDEX', item)
+			// 	}
+			// })
+			// this.bags = bags
+			// console.log('BAGS', this.bags)
 		},
 		confirmOrder() {
 			this.createOrder()
 		},
 		createOrder(){
-			// To ensure stock availability
-			// for (let index = 0; index < this.cart.length; index++) {
-			// 	const product = await this.getProduct(cart[index].id)
-			// 	if(product.stock <=0)
-			// 		delete cart[index]
-			// }
 			this.bags.forEach(bag => {
 				this.$store.dispatch('createOrder', bag.items)
 			})
-			// this.$store.dispatch('createOrder')
 		},
-		// async getProduct(id) {
-		// 	return await this.dispatch('getProductById', id)
-		// },
-		// subscribeCreateOrder() {
-		// 	API.graphql({ query: onCreateOrder, authMode: 'API_KEY' }).subscribe({
-		// 		next: (eventData) => {
-		// 			console.log('Order Created', eventData)
-		// 			//remove from cart
-		// 			this.loading = false
-		// 			this.confirm = true
-		// 			this.$store.dispatch('emptyCart')
-		// 		}
-		// 	});
-		// },
 	},
 	watch: {
 		cart() {
+			this.$store.commit('EMPTY_BAGS')
 			this.createBags()
 		}
 	}

@@ -63,21 +63,29 @@
 	
   export default {
 		name: 'cart-item',
-		created() {
-			console.log('ITEM', this.product)
+		// created() {
+		// 	console.log('ITEM', this.product)
+		// },
+		props: {
+			product: {
+				type: Object,
+				required: true
+			}
 		},
-		props: ['product'],
     methods : {
       increment() {
 				// if(this.product.inventory.stock === undefined || this.product.inventory.stock === 0 || this.product.quantity === this.product.inventory.stock) return
-				this.$store.dispatch('incrementCartQuantity', this.product)
+				// this.$store.dispatch('incrementCartQuantity', this.product)
+				this.$store.commit('INCREMENT_CART_QUANTITY', this.product)
 			},
 			decrement() {
 				// if(this.product.quantity === this.product.leastCount) return
-				this.$store.dispatch('decrementCartQuantity', this.product)
+				// this.$store.dispatch('decrementCartQuantity', this.product)
+				this.$store.commit('DECREMENT_CART_QUANTITY', this.product)
 			},
 			remove() {
-				this.$store.dispatch('removeFromCart', this.product.id)
+				// this.$store.dispatch('removeFromCart', this.product.id)
+				this.$store.commit('REMOVE_FROM_CART', this.product)
 			}
 		},
 		components: {
