@@ -11,7 +11,8 @@ import Cart from '@/pages/Cart';
 
 import Orders from '@/pages/Orders';
 
-import ProductView from '@/pages/product/View';
+// import ProductView from '@/pages/product/View';
+import ProductView from '@/components/product/View';
 import OrderView from '@/pages/order/View';
 
 import Profile from '@/pages/Profile';

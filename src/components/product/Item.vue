@@ -6,7 +6,7 @@
 					<ProductImage :imgUrl="product.image" :hsn="product.hsn" />
 				</v-list-item-avatar>
 				<v-list-item-content>
-					<ProductName :seller="product.seller" />
+					<ProductName :name="product.name" :seller="product.seller" />
 					<v-list-item-title class="mb-1">
 						<ProductPrice :product="product" />
 					</v-list-item-title>
