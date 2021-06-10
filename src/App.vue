@@ -1,63 +1,40 @@
 <template>
   <v-app>
     <NavigationDrawer/>
-    <!-- <v-navigation-drawer app>
-    </v-navigation-drawer>
-
-    <v-app-bar app>
-    </v-app-bar> -->
-    <!-- <Menu/> -->
-    <AppBar ref="drawer"/>
+    <AppBar/>
 
     <v-main>
-      <v-container>
-        <router-view></router-view>
+      <v-container fluid>
+        <router-view />
       </v-container>
     </v-main>
     <Footer/>
-    <!-- <v-footer app>
-    </v-footer> -->
   </v-app>
 </template>
 
 <script>
-// import Menu from '@/components/Menu';
-import Footer from '@/components/Footer';
-import NavigationDrawer from '@/components/NavigationDrawer';
 import AppBar from '@/components/AppBar';
+import NavigationDrawer from '@/components/NavigationDrawer';
+import Footer from '@/components/Footer';
 
-import { Auth } from 'aws-amplify'
 import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components'
-
-import { API } from 'aws-amplify';
-import { onUpdateProduct } from '@/graphql/subscriptions';
 
 export default {
   name: 'App',
-  created() {
-    Auth.currentAuthenticatedUser()
-      .then((user) => {
-        console.log('USER', user)
-        this.$store.commit('SET_AUTH_STATE', 'signedin')
-        this.$store.commit('SET_AUTH_DATA', {attributes: user.attributes, signInUserSession: user.signInUserSession})
-      }).catch(err => {
-        console.log(err)
-        this.$store.commit('SET_AUTH_STATE', 'signedout')
-        this.$store.commit('SET_AUTH_DATA', null)
-      })
+  async created() {
+    await this.$store.dispatch('authenticate')
 
     onAuthUIStateChange((authState, authData) => {
-      console.log('AUTH STATE', authState)
-      if(authState === AuthState.SignedIn) {// 'signedin') {
-        this.$store.commit('SET_AUTH_STATE', authState)
-        this.$store.commit('SET_AUTH_DATA', authData)
-      } else {
-        this.$store.commit('SET_AUTH_STATE', 'signedout')
-        this.$store.commit('SET_AUTH_DATA', null)
-      }
-      if(authState === 'signedin' && this.$route.path === '/login' )
+      console.log("AUTH CHANGED")
+      this.$store.commit('SET_AUTH', { authState, authData })
+      // if(authData && authData.attributes['custom:seller_id']) {
+      //   // this.$store.commit('SET_SELLER', authData.username)
+      //   // this.$store.commit('SET_SELLER_BY_ID', parseInt(authData.attributes['custom:seller_id']))
+      // }
+
+      if(authState === AuthState.SignedIn && this.$route.path === '/authenticate' )
         this.$router.push('/')
-      if(authState === 'signedout' && this.$route.path === '/logout' )
+      if(authState === AuthState.SignedOut && this.$route.path === '/authenticate' )
         this.$router.push('/')
     })
   },
@@ -65,25 +42,9 @@ export default {
     return onAuthUIStateChange;
   },
   components: {
-    // Menu,
-    NavigationDrawer,
     AppBar,
+    NavigationDrawer,
     Footer
-  },
-  subscribe() {
-    this.subscription = API.graphql({ query: onUpdateProduct })
-      .subscribe({
-        next: (eventData) => {
-          console.log('Product updated', eventData)
-          // let productId = eventData.value.data.onUpdateProduct.id
-        }
-      });
-  },
-  unsubscribe() {
-    this.subscription.unsubscribe();
-  },
-  data: () => ({
-    //
-  }),
+  }
 };
 </script>

@@ -43,46 +43,6 @@
 					</v-list-item-subtitle>
 				</v-list-item-content>
 				<v-list-item-action>
-					<!-- <v-dialog
-						v-model="dialog"
-						max-width="500"
-					>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn
-								small
-								color="primary"
-								outlined
-								v-bind="attrs"
-								v-on="on"
-							>
-								UPDATE
-							</v-btn>
-						</template>
-
-						<v-card>
-							<v-card-title class="headline grey lighten-2 mb-6">
-								Update Quarter No.
-							</v-card-title>
-
-							<v-card-text>
-								To update your quarter number, please send a mail to {{this.$store.state.customerCare.email}} or you can send a Whatsapp message to {{this.$store.state.customerCare.whatsapp}}
-							</v-card-text>
-
-							<v-divider></v-divider>
-
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn
-									color="primary"
-									text
-									@click="dialog = false"
-								>
-									OK
-								</v-btn>
-							</v-card-actions>
-						</v-card>
-					</v-dialog> -->
-
           <v-btn small color="primary" :to="'/profile'" outlined>
             UPDATE
           </v-btn>
