@@ -28,6 +28,7 @@ const AUTH_STATE = 'AUTH_STATE'
 const SET_AUTH = 'SET_AUTH'
 const SET_USER = 'SET_USER'
 const SET_ROLE = 'SET_ROLE'
+const UPDATE_USER = 'UPDATE_USER'
 
 export const SHOW_LOADER = 'SHOW_LOADER'
 export const HIDE_LOADER = 'HIDE_LOADER'
@@ -121,7 +122,7 @@ export default new Vuex.Store({
         state.isAuthorized = true
         state.user = authData
         const userRoles = authData.signInUserSession.accessToken.payload['cognito:groups']
-        if(userRoles.length > 0){
+        if(userRoles && userRoles.length > 0){
 					state.roles = userRoles
 				}
       } else {
@@ -129,6 +130,16 @@ export default new Vuex.Store({
         state.user = null
         state.roles = []
       }
+    },
+    [UPDATE_USER] (state, payload) {
+      state.user.attributes.name = payload.name
+      state.user.attributes.address = payload.address
+      if(payload['custom:area'])
+        state.user.attributes['custom:area'] = payload['custom:area']
+      if(payload['custom:employee_no'])
+        state.user.attributes['custom:employee_no'] = payload['custom:employee_no']
+      if(payload['custom:seller_id'])
+        state.user.attributes['custom:seller_id'] = payload['custom:seller_id']
     }
   },
   actions: {
@@ -140,6 +151,25 @@ export default new Vuex.Store({
           commit(SET_AUTH, {authState: '', authData: null})
           console.log(err)
         })
+    },
+    async updateUser({commit}, payload) {
+      commit(SHOW_LOADER)
+      const user = await Auth.currentAuthenticatedUser();
+      console.log('USER FORM', payload)
+      Auth.updateUserAttributes(user, {
+        'name': payload.name,
+        'custom:employee_no': payload['custom:employee_no'] || '000',
+        'address': payload.address,
+        'custom:area': payload['custom:area'] || 'Phase-I D+ Type Area',
+        'custom:seller_id': payload['custom:seller_id'] || '000'
+      })
+      .then( () => {
+        console.log('USER AFTER UPDATE', payload)
+        commit(UPDATE_USER, payload)
+      })
+      .catch(error => {
+        console.log('ERROr UPDATING USER', error)
+      })
     }
   },
   modules: {
