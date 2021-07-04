@@ -1,11 +1,16 @@
 {
   "name": "kpeccsl",
   "version": "0.1.0",
-  "private": true,
+  "engines": {
+    "node": "12.x"
+  },
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "postinstall": "npm run build",
+    "start": "node server.js"
   },
   "dependencies": {
     "@aws-amplify/ui-vue": "^1.0.7",
@@ -16,9 +21,7 @@
     "vue-router": "^3.5.1",
     "vuetify": "^2.4.0",
     "vuex": "^3.6.2",
-    "vuex-persist": "^3.1.3"
-  },
-  "devDependencies": {
+    "vuex-persist": "^3.1.3",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
@@ -30,6 +33,8 @@
     "vue-cli-plugin-vuetify": "~2.4.0",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.7.0"
+  },
+  "devDependencies": {
   },
   "eslintConfig": {
     "root": true,
